@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun FirstScreen(navigationToSecondScreen:(String)->Unit) {
+fun ThirdScreen(navigateToFirstScreen : ()->Unit) {
     var name = remember {
         mutableStateOf("")
     }
@@ -30,23 +30,18 @@ fun FirstScreen(navigationToSecondScreen:(String)->Unit) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
-        Text("This is the First Screen", fontSize = 24.sp)
+        Text("This is the Third Screen", fontSize = 24.sp)
         Spacer(modifier = Modifier.height(16.dp))
-        OutlinedTextField(value = name.value, onValueChange = {
-            name.value = it
-        })
         Button(onClick = {
-            navigationToSecondScreen(name.value)
+            navigateToFirstScreen()
         }) {
-            Text("Go to Second Screen")
+            Text("This is the ThirdScreen Go to First Screen")
         }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun FirstPreview() {
-    FirstScreen({})
+fun PreviewThirdScreen() {
+    ThirdScreen({})
 }
-
-
