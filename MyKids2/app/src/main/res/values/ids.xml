@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="ib_small_brush" type="id" />
+    <item name="ib_brush" type="id" />
+</resources>

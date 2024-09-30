@@ -44,7 +44,7 @@ class DrawingView(context: Context, attrs : AttributeSet) : View(context, attrs)
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        Log.d("dlgmlals3" ,"onDraw")
+        Log.d("dlgmlals3" ,"onDraw " + mPaths.count())
         canvas.drawBitmap(mCanvasBitmap!!, 0f, 0f, mCanvasPaint)
 
         for (path in mPaths) {
@@ -92,7 +92,7 @@ class DrawingView(context: Context, attrs : AttributeSet) : View(context, attrs)
     fun setSizeForBrush(newSize : Float) {
         mBrushSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
             newSize, resources.displayMetrics)
-
+        mDrawPaint!!.strokeWidth = mBrushSize
     }
 
 
