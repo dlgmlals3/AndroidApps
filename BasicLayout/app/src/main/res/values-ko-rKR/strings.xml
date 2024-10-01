@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">베이직 레이아웃</string>
+    <string name="button1_text">나는 버튼</string>
+</resources>

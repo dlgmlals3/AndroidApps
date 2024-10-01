@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">BasicLayout</string>
+    <string name="button1_text">Im a buton \n Nice to meet you </string>
 </resources>
