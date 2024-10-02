@@ -1,11 +1,16 @@
 package com.example.basiclayout
 
 import android.os.Bundle
-import android.util.Log
-import android.widget.CompoundButton
-import android.widget.CompoundButton.OnCheckedChangeListener
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.basiclayout.databinding.ActivityMainBinding
+import com.example.basiclayout.databinding.ItemRecyclerBinding
+import java.text.SimpleDateFormat
+
 
 class MainActivity : AppCompatActivity() {
     val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
@@ -15,49 +20,63 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        with(binding){
-            checkApple.setOnCheckedChangeListener {button, isChecked ->
-                if (isChecked) {
-                    Log.d(TAG, "apple selection")
-                } else {
-                    Log.d(TAG, "apple is not selected")
-                }
-            }
-        }
+        // 1. 데이터를 불러온다
+        val data = loadData()
+        // 2. 아답터를 생성한다.
+        val customAdapter = CustomAdapter(data)
+        // 3. 화면의 recyclerView와 연결
+        binding.recycleView.adapter = customAdapter
+        // 4. 레이아웃 매니저 설정
+        binding.recycleView.layoutManager = LinearLayoutManager(this)
+    }
 
-        val checkBoxListener2 = object : CompoundButton.OnCheckedChangeListener {
-            override fun onCheckedChanged(checkBox: CompoundButton?, isChecked: Boolean) {
-                when (checkBox?.id) {
-                    R.id.checkApple -> {
-                        Log.d(TAG, "apple ${isChecked}")
-                    }
-                    R.id.checkBanana -> {
-                        Log.d(TAG, "banana  ${isChecked}")
-                    }
-                    R.id.checkKiwi -> {
-                        Log.d(TAG, "kiwi  ${isChecked}")
-                    }
-                }
-            }
+    fun loadData() : MutableList<Memo> {
+        val memoList = mutableListOf<Memo>()
+        for (no in 1 .. 100) {
+            val title = "android is $no"
+            val date = System.currentTimeMillis()
+            val memo = Memo(no, title, date)
+            memoList.add(memo)
         }
+        return memoList
+    }
+}
 
-        val checkBoxListener = CompoundButton.OnCheckedChangeListener { checkBox, isChecked ->
-            when (checkBox.id) {
-                R.id.checkApple -> {
-                    Log.d(TAG, "apple ${isChecked}")
-                }
-                R.id.checkBanana -> {
-                    Log.d(TAG, "banana  ${isChecked}")
-                }
-                R.id.checkKiwi -> {
-                    Log.d(TAG, "kiwi  ${isChecked}")
-                }
+class CustomAdapter(val listData : MutableList<Memo>) : RecyclerView.Adapter<CustomAdapter.Holder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
+        val binding = ItemRecyclerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return Holder(binding)
+    }
+
+    override fun getItemCount(): Int = listData.size
+
+    override fun onBindViewHolder(holder: Holder, position: Int) {
+        // 1. 사용할 데이터를 꺼내고
+        val memo = listData.get(position)
+        // 2. 홀더에 데이터를 전달한다.
+        holder.setMemo(memo)
+    }
+
+    class Holder(val binding:ItemRecyclerBinding) : RecyclerView.ViewHolder(binding.root) {
+        lateinit var currentMemo:Memo
+        init {// 클릭처리는 init 에서만 해야 한다.
+            binding.root.setOnClickListener {
+                val title=  binding.textTitle.text
+                Toast.makeText(binding.root.context,
+                     "클릭된 아이템 ${currentMemo.title}", Toast.LENGTH_SHORT).show()
             }
         }
-        with (binding){
-            checkApple.setOnCheckedChangeListener(checkBoxListener2)
-            checkBanana.setOnCheckedChangeListener(checkBoxListener2)
-            checkKiwi.setOnCheckedChangeListener(checkBoxListener2)
+        // 3. 받은 데이터를 화면에 출력한다.
+        fun setMemo(memo: Memo) {
+            currentMemo = memo
+            with(binding) {
+                textNo.text = "${memo.no}"
+                textTitle.text = "${memo.title}"
+                val sdf = SimpleDateFormat("yyyy-mm-dd")
+                val formattedDate = sdf.format(memo.timestamp)
+                textDate.text = formattedDate
+
+            }
         }
 
     }
