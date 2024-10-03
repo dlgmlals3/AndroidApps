@@ -19,18 +19,28 @@ class DrawingView(context: Context, attrs : AttributeSet) : View(context, attrs)
     private var canvas : Canvas? = null
     private val mPaths = ArrayList<CustomPath>()
 
+    private val mUndoPaths = ArrayList<CustomPath>()
+
+    private val TAG : String = "DrawingView"
 
     init {
         setUpDrawing()
+    }
+
+    fun onClickUndo() {
+        if (mPaths.size > 0) {
+            mUndoPaths.add(mPaths.removeAt(mPaths.size - 1))
+            invalidate()
+        }
     }
 
     private fun setUpDrawing() {
         mDrawPaint = Paint()
         mDrawPath = CustomPath(color, mBrushSize)
 
-        mDrawPaint!!.color = color
-        mDrawPaint!!.style = Paint.Style.STROKE
-        mDrawPaint!!.strokeJoin = Paint.Join.ROUND
+        mDrawPaint?.color = color
+        mDrawPaint?.style = Paint.Style.STROKE
+        mDrawPaint?.strokeJoin = Paint.Join.ROUND
         mDrawPaint!!.strokeCap = Paint.Cap.ROUND
         mCanvasPaint = Paint(Paint.DITHER_FLAG)
     }
@@ -44,12 +54,11 @@ class DrawingView(context: Context, attrs : AttributeSet) : View(context, attrs)
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        Log.d("dlgmlals3" ,"onDraw " + mPaths.count())
         canvas.drawBitmap(mCanvasBitmap!!, 0f, 0f, mCanvasPaint)
 
         for (path in mPaths) {
-            mDrawPaint!!.strokeWidth = path.brushThickness
-            mDrawPaint!!.color = path.color
+            mDrawPaint?.strokeWidth = path.brushThickness
+            mDrawPaint?.color = path.color
             canvas.drawPath(path, mDrawPaint!!)
         }
 
@@ -63,7 +72,6 @@ class DrawingView(context: Context, attrs : AttributeSet) : View(context, attrs)
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         val touchX = event?.x
         val touchY = event?.y
-        Log.d("dlgmlals3" ,"onTouchEvent")
 
         when (event?.action) {
             MotionEvent.ACTION_DOWN -> {
@@ -90,11 +98,17 @@ class DrawingView(context: Context, attrs : AttributeSet) : View(context, attrs)
     }
 
     fun setSizeForBrush(newSize : Float) {
-        mBrushSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+        Log.d(TAG, "setSizeForBurch : ${newSize}")
+        mBrushSize = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
             newSize, resources.displayMetrics)
         mDrawPaint!!.strokeWidth = mBrushSize
     }
 
+    fun setColor(newColor : String) {
+        color = Color.parseColor(newColor)
+        mDrawPaint?.color = color
+    }
 
     internal inner class CustomPath(var color : Int,
                                     var brushThickness : Float) : Path() {
