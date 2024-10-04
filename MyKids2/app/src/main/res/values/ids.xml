@@ -2,4 +2,5 @@
 <resources>
     <item name="ib_small_brush" type="id" />
     <item name="ib_brush" type="id" />
+    <item name="textView" type="id" />
 </resources>
