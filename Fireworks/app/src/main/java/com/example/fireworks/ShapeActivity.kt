@@ -1,12 +1,17 @@
 package com.example.fireworks;
 
 import android.annotation.SuppressLint
+import android.graphics.PixelFormat
 import android.opengl.GLES20
 import android.opengl.GLES31
 import android.opengl.GLSurfaceView
 import android.opengl.Matrix
 import android.os.Bundle
+import android.os.SystemClock
+import android.util.Log
+import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
+import com.example.fireworks.databinding.ActivityShapeBinding
 import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -19,7 +24,6 @@ import javax.microedition.khronos.opengles.GL10
  * This class uses for render shape using OpenGLES
  */
 class ShapeActivity : AppCompatActivity(), GLSurfaceView.Renderer {
-
     companion object {
         private const val VERTEX_SHADER_NAME = "shaders/vertexShader.vert"
         private const val FRAGMENT_SHADER_NAME = "shaders/fragmentShader.frag"
@@ -35,13 +39,7 @@ class ShapeActivity : AppCompatActivity(), GLSurfaceView.Renderer {
             1.0f, -1.0f,
             1.0f, 1.0f
         )
-        /*private val QUADRANT_COORDINATES = floatArrayOf(
-            //x,    y
-            -.5f, .5f,
-            -.5f, -.5f,
-            .5f, -.5f,
-            .5f, .5f
-        )*/
+
         private val DRAW_ORDER = shortArrayOf(0, 1, 2, 0, 2, 3)
     }
 
@@ -51,6 +49,15 @@ class ShapeActivity : AppCompatActivity(), GLSurfaceView.Renderer {
     private var quadPositionHandle = -1
     private var viewProjectionMatrixHandle: Int = -1
     private var program: Int = -1
+    private var timeHandle: Int =-1
+    private var explosionHandler: Int = -1
+    private var particleHandler: Int = -1
+
+    private var particleNum: Float = 95f
+    private var explostionNum: Float = 5f
+
+
+    val binding by lazy { ActivityShapeBinding.inflate(layoutInflater) }
 
     /**
      * Convert float array to float buffer
@@ -76,22 +83,45 @@ class ShapeActivity : AppCompatActivity(), GLSurfaceView.Renderer {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_shape)
+        setContentView(binding.root)
+        setConfiguration()
 
-        findViewById<GLSurfaceView>(R.id.glSurfaceView).setConfiguration()
+
+        val seekBarListener = object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(p0: SeekBar?, progress: Int, p2: Boolean) {
+                particleNum = progress.toFloat()
+            }
+            override fun onStartTrackingTouch(p0: SeekBar?) {}
+            override fun onStopTrackingTouch(p0: SeekBar?) {}
+        }
+
+        val explosionListener = object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(p0: SeekBar?, progress: Int, p2: Boolean) {
+                explostionNum = progress.toFloat()
+            }
+            override fun onStartTrackingTouch(p0: SeekBar?) {}
+            override fun onStopTrackingTouch(p0: SeekBar?) {}
+        }
+        binding.particleSeekBar.setOnSeekBarChangeListener(seekBarListener)
+        binding.explosionSeekBar.setOnSeekBarChangeListener(explosionListener)
     }
 
     /**
      * Uses for set configuration of GlSurfaceView
      */
     @SuppressLint("ClickableViewAccessibility")
-    fun GLSurfaceView.setConfiguration() {
-        keepScreenOn = true // Keep screen awake till ARCore performs detection
-        preserveEGLContextOnPause = true
-        setEGLContextClientVersion(2)
-        setEGLConfigChooser(8, 8, 8, 8, 16, 0)
-        setRenderer(this@ShapeActivity)
-        renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY
+    fun setConfiguration() {
+        //this.keepScreenOn = true // Keep screen awake till ARCore performs detection
+        //this.preserveEGLContextOnPause = true
+        Log.d(TAG, "SetConfiguration")
+        with (binding) {
+            glSurfaceView.setEGLContextClientVersion(2)
+            glSurfaceView.setZOrderOnTop(true);
+            glSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0)
+            glSurfaceView.getHolder().setFormat(PixelFormat.RGBA_8888)
+            glSurfaceView.setRenderer(this@ShapeActivity)
+            glSurfaceView.renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY
+        }
     }
 
     /**
@@ -99,8 +129,8 @@ class ShapeActivity : AppCompatActivity(), GLSurfaceView.Renderer {
      */
     override fun onSurfaceCreated(p0: GL10?, p1: EGLConfig?) {
         // Set GL clear color to black.
-
-        GLES31.glClearColor(0f, 0f, 0f, 1.0f)
+        Log.d(TAG, " onSurfaceCreated")
+        GLES31.glClearColor(0f, 0f, 0f, 0f) // 투명
 
         // Prepare the rendering objects. This involves reading shaders, so may throw an IOException.
         try {
@@ -126,7 +156,11 @@ class ShapeActivity : AppCompatActivity(), GLSurfaceView.Renderer {
             //Quadrant position handler
             quadPositionHandle = GLES31.glGetAttribLocation(program, "a_Position")
 
-            // View projection transformation matrix handler
+            explosionHandler = GLES31.glGetUniformLocation(program, "num_explosion")
+            particleHandler = GLES31.glGetUniformLocation(program, "num_particle")
+
+
+            timeHandle = GLES31.glGetUniformLocation(program, "u_time")
             viewProjectionMatrixHandle = GLES31.glGetUniformLocation(program, "uVPMatrix")
 
             ShaderUtil.checkGLError(TAG, "Program parameters")
@@ -152,14 +186,19 @@ class ShapeActivity : AppCompatActivity(), GLSurfaceView.Renderer {
      */
     override fun onDrawFrame(p0: GL10?) {
         // Use the cGL clear color specified in onSurfaceCreated() to erase the GL surface.
-        GLES31.glClear(GLES31.GL_COLOR_BUFFER_BIT or GLES31.GL_DEPTH_BUFFER_BIT)
+        //GLES31.glClear(GLES31.GL_COLOR_BUFFER_BIT or GLES31.GL_DEPTH_BUFFER_BIT)
+        GLES31.glClear(GLES31.GL_COLOR_BUFFER_BIT)
 
         // Set the camera position (View matrix)
         Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, 3f, 0f, 0f, 0f, 0f, 1.0f, 0.0f)
-
         // Calculate the projection and view transformation
         Matrix.multiplyMM(vPMatrix, 0, projectionMatrix, 0, viewMatrix, 0)
 
+        GLES31.glUniform1f(timeHandle, (SystemClock.elapsedRealtime() * 0.001f) % 1000)
+        GLES31.glUniform1f(explosionHandler, explostionNum)
+        GLES31.glUniform1f(particleHandler, particleNum)
+
+        //Log.d(TAG, "uniform : ${explostionNum} , ${particleNum}")
         try {
             GLES31.glUseProgram(program)
 
