@@ -52,10 +52,10 @@ void main(void) {
 
        vec3 color = sin(4. * vec3(.34, .54, .43) * ft) * .25 + .75; // 10
        vec2 offs = Hash12(i + 1. + ft) - .5; // 14
-       offs *= vec2(1.77, 1.);
+       offs *= vec2(1.2, 1.5);
        col += Explosion(uv - offs, fract(t)) * color;
     }
 
     //col = vec3(uv, 0.);
-    FragColor = vec4(col * .4, 0.);
+    FragColor = vec4(col * .3, 0.);
 }
