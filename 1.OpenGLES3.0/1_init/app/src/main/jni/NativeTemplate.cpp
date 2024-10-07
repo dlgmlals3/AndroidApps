@@ -199,20 +199,46 @@ bool GraphicsRender()
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
+void testString(char* buf) {
+
+}
+
 #ifdef __ANDROID__
-JNIEXPORT void JNICALL Java_cookbook_gles_GLESNativeLib_init( JNIEnv *env, jobject obj, jstring FilePath )
+// dlgmlals3
+extern "C" JNIEXPORT void JNICALL Java_com_example_init_GLESNativeLib_init( JNIEnv *env, jclass obj, jstring FilePath )
 {
 	setenv( "FILESYSTEM", env->GetStringUTFChars( FilePath, NULL ), 1 );
-	GraphicsInit();
+	//GraphicsInit();
 }
 
-JNIEXPORT void JNICALL Java_cookbook_gles_GLESNativeLib_resize( JNIEnv *env, jobject obj, jint width, jint height)
+extern "C" JNIEXPORT void JNICALL Java_com_example_init_GLESNativeLib_resize( JNIEnv *env, jclass  obj, jint width, jint height)
 {
-	GraphicsResize( width, height );
+	//GraphicsResize( width, height );
+
 }
 
-JNIEXPORT void JNICALL Java_cookbook_gles_GLESNativeLib_step(JNIEnv * env, jobject obj)
+extern "C" JNIEXPORT void JNICALL Java_com_example_init_GLESNativeLib_step(JNIEnv * env, jclass  obj)
 {
-	GraphicsRender();
+	//GraphicsRender();
+}
+
+extern "C" JNIEXPORT jstring JNICALL Java_com_example_init_GLESNativeLib_dlgmlals3(JNIEnv * env, jclass  clazz, jstring dlgmlals3)
+{
+    //GraphicsRender();
+    // string
+    const char* w_buf = env->GetStringUTFChars(dlgmlals3, 0);
+    __android_log_print(ANDROID_LOG_INFO, "TESTJNI","dlgmlals3 String: %s", w_buf);
+
+    // callback
+    jmethodID mCallbackB = env->GetStaticMethodID(clazz, "onCallBack", "()V");  // 정적 메서드 ID 획득
+    env->CallStaticVoidMethod(clazz, mCallbackB);  // 정적 메서드 onCallBack 호출
+
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();  // 예외 내용 출력
+        env->ExceptionClear();  // 예외 클리어
+    }
+
+    env->ReleaseStringUTFChars(dlgmlals3, w_buf);
+    return dlgmlals3;
 }
 #endif
