@@ -297,7 +297,6 @@ class GLESView extends GLSurfaceView {
         }
 
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-            // Do nothing.
             Log.w(TAG, "onSurfaceCreated Called");
             GLESNativeLib.init(filePath);
         }

@@ -35,13 +35,13 @@ GLuint createProgramExec(const char* vertexSource, const char* fragmentSource);
 void printOpenGLESInfo();
 
 //! Initialize the shader.
-bool GraphicsInit();
+void GraphicsInit();
 
 //! Set the Viewport with provide width and height.
-bool GraphicsResize( int width, int height );
+void GraphicsResize( int width, int height );
 
 //! Render the triangle geometry.
-bool GraphicsRender();
+void GraphicsRender();
 
 
 #endif

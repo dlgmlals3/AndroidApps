@@ -21,12 +21,13 @@ static const char vertexShader[] =
         "in vec4        VertexPosition;                           \n"
         "in vec4        VertexColor;                              \n"
         "uniform float  RadianAngle;                              \n"
-
         "out vec4       TriangleColor;                            \n"
-        "mat2 rotation = mat2(cos(RadianAngle),sin(RadianAngle),  \
-                     -sin(RadianAngle),cos(RadianAngle)); \n"
+
         "void main() {                                            \n"
-        "  gl_Position   = mat4(rotation)*VertexPosition;         \n"
+        "  mat2 rotation = mat2(cos(RadianAngle), sin(RadianAngle), \n"
+        "                       -sin(RadianAngle), cos(RadianAngle)); \n"
+        "  vec2 position = rotation * VertexPosition.xy;            \n"
+        "  gl_Position   = vec4(position, VertexPosition.zw); \n"
         "  TriangleColor = VertexColor;                           \n"
         "}\n";
 
@@ -141,47 +142,12 @@ void printOpenGLESInfo(){
     printGLString("GL Shading Language", GL_SHADING_LANGUAGE_VERSION);
 }
 
-/*! \fn bool GraphicsInit()
- * It provide the OpenGLES device and software specifications during the initilization.
- * This is also responsible for
- * program useful in rendering the OpenGLE
- */
-bool GraphicsInit()
-{
-    printOpenGLESInfo();
-    programID = createProgramExec(vertexShader, fragmentShader);
-    if (!programID) {
-        LOGE("Could not create program."); return false;
-    }
-    checkGlError("GraphicsInit");
-}
-
-/*! \fn bool setupGraphics(int w, int h)
- * This function use the width and height parameter to set the viewport information.
- */
-bool GraphicsResize( int width, int height )
-{
-    glViewport(0, 0, width, height);
-}
-
-/*! \fn void GraphicsRender()
- * This function render's the Triangle primitive on screen.
- */
-bool GraphicsRender()
-{
-    // Which buffer to clear? – color buffer
-    glClear( GL_COLOR_BUFFER_BIT );
-
-    // Clear color with black color
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
+void SettingAttributeAndUniform() {
     // Use shader program to apply on current primitives
     glUseProgram( programID );
-    radian = degree++/57.2957795;
 
     // Query and send the uniform variable.
     radianAngle          = glGetUniformLocation(programID, "RadianAngle");
-    glUniform1f(radianAngle, radian);
 
     // Query ‘VertexPosition’ from vertex shader
     positionAttribHandle = glGetAttribLocation(programID, "VertexPosition");
@@ -194,32 +160,54 @@ bool GraphicsRender()
     // Enable vertex position attribute
     glEnableVertexAttribArray(positionAttribHandle);
     glEnableVertexAttribArray(colorAttribHandle);
+}
+
+void GraphicsInit()
+{
+    printOpenGLESInfo();
+    programID = createProgramExec(vertexShader, fragmentShader);
+    if (!programID) {
+        LOGE("Could not create program.");
+    }
+    checkGlError("GraphicsInit");
+}
+
+void GraphicsResize( int width, int height )
+{
+    glViewport(0, 0, width, height);
+}
+
+void GraphicsRender()
+{
+    // Which buffer to clear? – color buffer
+    glClear( GL_COLOR_BUFFER_BIT );
+
+    // Clear color with black color
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+    SettingAttributeAndUniform();
+    radian = degree++/57.2957795;
+    glUniform1f(radianAngle, radian);
 
     // Draw 3 triangle vertices from 0th index
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
-void testString(char* buf) {
-
-}
-
 #ifdef __ANDROID__
-// dlgmlals3
 extern "C" JNIEXPORT void JNICALL Java_com_example_init_GLESNativeLib_init( JNIEnv *env, jclass obj, jstring FilePath )
 {
 	setenv( "FILESYSTEM", env->GetStringUTFChars( FilePath, NULL ), 1 );
-	//GraphicsInit();
+	GraphicsInit();
 }
 
 extern "C" JNIEXPORT void JNICALL Java_com_example_init_GLESNativeLib_resize( JNIEnv *env, jclass  obj, jint width, jint height)
 {
-	//GraphicsResize( width, height );
-
+	GraphicsResize( width, height );
 }
 
 extern "C" JNIEXPORT void JNICALL Java_com_example_init_GLESNativeLib_step(JNIEnv * env, jclass  obj)
 {
-	//GraphicsRender();
+	GraphicsRender();
 }
 
 extern "C" JNIEXPORT jstring JNICALL Java_com_example_init_GLESNativeLib_dlgmlals3(JNIEnv * env, jclass  clazz, jstring dlgmlals3)
