@@ -11,6 +11,7 @@ private:
     GLuint positionAttribHandle;
     GLuint colorAttribHandle;
 	GLfloat  colors[9];
+
 public:
     Triangle( Renderer* parent = 0);
     ~Triangle();

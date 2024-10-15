@@ -8,15 +8,10 @@
 #include "Cache.h"
 //#include "Transform.h"
 #include "constant.h"
+#include "ShaderManager.h"
 
-//Note: The Linux is very case sensitive so be aware of specifying correct folder and filename.
-#ifdef __APPLE__
-#define VERTEX_SHADER_PRG			( char * )"TriangleVertex.glsl"
-#define FRAGMENT_SHADER_PRG			( char * )"TriangleFragment.glsl"
-#else
 #define VERTEX_SHADER_PRG			( char * )"shader/TriangleVertex.glsl"
 #define FRAGMENT_SHADER_PRG			( char * )"shader/TriangleFragment.glsl"
-#endif
 
 // Namespace used
 using std::ifstream;
@@ -72,7 +67,8 @@ Triangle::~Triangle()
 */
 void Triangle::InitModel()
 {
-	if (!(program = ProgramManagerObj->Program( ( char * )"Triangle" ))){
+
+	if (!(program = ProgramManagerObj->Program( ( char * )"Triangle" ))) {
 		program = ProgramManagerObj->ProgramInit( ( char * )"Triangle" );
 		ProgramManagerObj->AddProgram( program );
 	}
@@ -99,6 +95,7 @@ void Triangle::InitModel()
     if( !ProgramManagerObj->ProgramLink( program, 1 ) ) exit( 3 );
 
     glUseProgram( program->ProgramID );
+
     return;
 }
 

@@ -10,17 +10,20 @@
 bool GraphicsInit()
 {
     Renderer::Instance().initializeRenderer();
+    return true;
 }
 
 bool GraphicsResize( int width, int height )
 {
     Renderer::Instance().resize(width, height);
+    return true;
 }
 
 bool GraphicsRender()
 {
     Renderer::Instance().setUpProjection();
     Renderer::Instance().render();
+    return true;
 }
 
 void TouchEventDown( float x, float y )

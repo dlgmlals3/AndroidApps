@@ -17,6 +17,7 @@ void Renderer::initializeRenderer()
 
 void Renderer::createModels()
 {
+    LOGI("createModels");
 	clearModels();
 
 	//addModel( new Cube	( this ) );
@@ -32,10 +33,12 @@ void Renderer::createModels()
 */
 void Renderer::clearModels()
 {
+    LOGI("clearModels");
 	for( int i=0; i<RenderMemData.models.size();  i++ ){
 		delete RenderMemData.models.at(i);
 	}
 	RenderMemData.models.clear();
+    LOGI("clearModels END");
 }
 
 /*!
@@ -90,6 +93,7 @@ void Renderer::resize(int w, int h)
 */
 void Renderer::setUpModels()
 {
+    LOGI("setUpModels");
 	// ! Generate the models and cache all
 	createModels();
 
@@ -127,6 +131,7 @@ Model* Renderer::getModel( ModelType type)
 */
 void Renderer::addModel(Model* model)
 {
+    LOGI("addModel");
 	RenderMemData.models.push_back( model );
 }
 
