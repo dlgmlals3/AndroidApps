@@ -26,6 +26,7 @@ bool Animate            = true;
 static int dimension    = 10;
 static float distance   = 5.0;
 static bool op          = true;
+GLuint vAo            = 0;
 GLuint vId              = 0;
 GLuint iId              = 0;
 int size                = 0;
@@ -69,35 +70,10 @@ Cube::Cube( Renderer* parent )
     ProgramManagerObj	= parent->RendererProgramManager();
     TransformObj		= parent->RendererTransform();
     modelType 			= CubeType;
-
     LOGI("gl2: Cube constructor");
-
-    size = 24 * sizeof(float);
-    glGenBuffers(1, &vId);
-
-    glBindBuffer( GL_ARRAY_BUFFER, vId );
-    glBufferData( GL_ARRAY_BUFFER, size + size, 0, GL_STATIC_DRAW );
-    glBufferSubData( GL_ARRAY_BUFFER, 0,			size,	cubeVerts );
-    glBufferSubData( GL_ARRAY_BUFFER, size,			size,	cubeColors );
-
-    unsigned short indexSize = sizeof( unsigned short ) * 36;
-    glGenBuffers(1, &iId);
-    glBindBuffer( GL_ARRAY_BUFFER, iId );
-    glBufferData( GL_ARRAY_BUFFER, indexSize, 0, GL_STATIC_DRAW );
-    glBufferSubData( GL_ARRAY_BUFFER, 0, indexSize,	cubeIndices );
-
-    glBindBuffer( GL_ARRAY_BUFFER, 0 );
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 }
 
 
-/*!
-	Simple Destructor
-
-	\param[in] None.
-	\return None
-
-*/
 Cube::~Cube()
 {
     PROGRAM* program = NULL;
@@ -109,15 +85,9 @@ Cube::~Cube()
     glDeleteBuffers(1, &iId);
 }
 
-/*!
-	Initialize the scene, reserve shaders, compile and cache program
-
-	\param[in] None.
-	\return None
-
-*/
 void Cube::InitModel()
 {
+    LOGI("Init Model");
     if (! ( program = ProgramManagerObj->Program( (char *)"Cube" ))){
         program = ProgramManagerObj->ProgramInit( (char *)"Cube" );
         ProgramManagerObj->AddProgram( program );
@@ -126,9 +96,6 @@ void Cube::InitModel()
     program->VertexShader	= ShaderManager::ShaderInit( VERTEX_SHADER_PRG,	GL_VERTEX_SHADER	);
     program->FragmentShader	= ShaderManager::ShaderInit( FRAGMENT_SHADER_PRG, GL_FRAGMENT_SHADER	);
 
-    //////////////////////////////////////////////////////
-    /////////// Vertex shader //////////////////////////
-    //////////////////////////////////////////////////////
     CACHE *m = reserveCache( VERTEX_SHADER_PRG, true );
 
     if( m ) {
@@ -148,8 +115,47 @@ void Cube::InitModel()
     mvp    = ProgramManagerObj->ProgramGetUniformLocation( program, ( char* )"MODELVIEWPROJECTIONMATRIX" );
     attribVertex   = ProgramManagerObj->ProgramGetVertexAttribLocation(program, (char*)"VertexPosition");
     attribColor    = ProgramManagerObj->ProgramGetVertexAttribLocation(program, (char*)"VertexColor");
+    LOGI("InitModel location : %d %d\n", attribColor, attribVertex);
+
+    // VAO 바인딩 - 여기서부터 모든 설정이 VAO에 저장됨
+    glGenVertexArrays(1, &vAo);
+    glBindVertexArray(vAo);
+
+    // VBO 생성
+    glGenBuffers(1, &vId);
+    glGenBuffers(1, &iId);
+
+    // 버텍스 VBO 설정
+    size = 24 * sizeof(float);
+    glBindBuffer( GL_ARRAY_BUFFER, vId );
+    glBufferData( GL_ARRAY_BUFFER, size + size, 0, GL_STATIC_DRAW );
+    glBufferSubData( GL_ARRAY_BUFFER, 0,			size,	cubeVerts );
+    glBufferSubData( GL_ARRAY_BUFFER, size,			size,	cubeColors );
+
+    // 버텍스 버퍼 어트리뷰트 설정
+    GLint maxVertexAttribs;
+    glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxVertexAttribs);
+
+    glEnableVertexAttribArray(attribColor);
+    glEnableVertexAttribArray(attribVertex);
+    glVertexAttribPointer(attribVertex, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glVertexAttribPointer(attribColor, 3, GL_FLOAT, GL_FALSE, 0, (void*)size);
+
+    // 인덱스 VBO 설정
+    unsigned short indexSize = sizeof( unsigned short ) * 36;
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, iId );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, indexSize, 0, GL_STATIC_DRAW );
+    glBufferSubData( GL_ELEMENT_ARRAY_BUFFER, 0, indexSize,	cubeIndices );
+
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    // GL_ELEMENT_ARRAY_BUFFER는 GL_ARRAY_BUFFER와는 다르게, VAO에 영구적으로 바인딩되기 때문에 언바인딩 할필요 없음.
+    // GL_ELEMENT_ARRAY_BUFFER에 바인딩된 인덱스 버퍼는 VAO에 종속됩니다. 즉, 특정 VAO가 바인딩될 때마다 해당 VAO에 바인딩된 인덱스 버퍼가 함께 활성화됩니다.
+    // glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+    glBindVertexArray(0); // 여기까지 설정이 다 저장됌.
+
     return;
 }
+
 static float k = 0;
 
 void Cube::Render()
@@ -176,18 +182,10 @@ void Cube::Render()
 
 void Cube::RenderCube()
 {
+    glBindVertexArray(vAo);
     glUniformMatrix4fv( mvp, 1, GL_FALSE,(float*)TransformObj->TransformGetModelViewProjectionMatrix() );
-
-    glEnableVertexAttribArray(attribColor);
-    glEnableVertexAttribArray(attribVertex);
-
-    glBindBuffer( GL_ARRAY_BUFFER, vId );
-    glVertexAttribPointer(attribVertex, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-    glVertexAttribPointer(attribColor, 3, GL_FLOAT, GL_FALSE, 0, (void*)size);
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, iId );
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, (void*)0);
-    glBindBuffer( GL_ARRAY_BUFFER, 0 );
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+    glBindVertexArray(0);
 }
 
 void Cube::RenderCubeOfCubes()
@@ -201,7 +199,7 @@ void Cube::RenderCubeOfCubes()
             TransformObj->TransformTranslate(0.0,  distance, 0.0);
             TransformObj->TransformPushMatrix();
 
-            for (int j = 0; j<dimension; j++){
+            for (int k = 0; k<dimension; k++){
                 TransformObj->TransformTranslate(0.0,  0.0, distance);
                 RenderCube();
             }

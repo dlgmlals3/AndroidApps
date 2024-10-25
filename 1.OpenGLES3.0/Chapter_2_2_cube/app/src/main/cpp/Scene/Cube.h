@@ -15,6 +15,8 @@ private:
 public:
     Cube( Renderer* parent = 0);
     ~Cube();
+    void UseVBO();
+    void UseVAO();
 
     void InitModel();
 
