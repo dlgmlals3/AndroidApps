@@ -104,6 +104,8 @@ public:
 
 	void Vec4MultiplyMat4( glm::vec4* dst, glm::vec4 *v0, glm::mat4 *v1 );
 
+    void PrintMatrixMode();
+
 	TransformData TransformMemData;
 };
 

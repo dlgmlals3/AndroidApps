@@ -1,5 +1,6 @@
 #include "model.h"
 #include "Renderer.h"
+#include "GLutils.h"
 
 bool Model::useProgram(char* programName) 
 {
@@ -22,7 +23,8 @@ Model::~Model()
  */
 void Model::InitModel()
 {
-    for(int i =0; i<childList.size(); i++){
+    LOGI("InitModel dlgmlals3 !!!!");
+    for(int i =0; i <childList.size(); i++){
         childList.at(i)->InitModel();
     }
 }

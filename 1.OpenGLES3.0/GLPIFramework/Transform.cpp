@@ -131,6 +131,10 @@ void Transform::TransformSetMatrixMode( unsigned int mode )
  \return None.
  
 */
+void Transform::PrintMatrixMode( void ) {
+    LOGI("PrintMatrixMode : %d", TransformMemData.matrix_mode );
+}
+
 void Transform::TransformLoadIdentity( void )
 {
 	switch( TransformMemData.matrix_mode )

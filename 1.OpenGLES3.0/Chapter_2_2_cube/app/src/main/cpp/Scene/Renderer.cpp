@@ -67,8 +67,8 @@ void Renderer::setUpProjection()
     if ( considerAspectRatio ){
         GLfloat aspectRatio = (GLfloat)RenderMemData.screenWidth / (GLfloat)RenderMemData.screenHeight;
         if ( RenderMemData.isPerspective ){
-            TransformObj->TransformSetPerspective(60.0f, aspectRatio, 0.01, 1000, 0);
-        }else{
+            TransformObj->TransformSetPerspective(60.0f, aspectRatio, 0.001, 1000, 0);
+        } else {
             if ( RenderMemData.screenWidth <= RenderMemData.screenHeight ){
                 TransformObj->TransformOrtho( -span, span, -span / aspectRatio, span / aspectRatio, -span, span);
             }
@@ -87,7 +87,16 @@ void Renderer::setUpProjection()
     }
     TransformObj->TransformSetMatrixMode( VIEW_MATRIX );
     TransformObj->TransformLoadIdentity();
-    TransformObj->TransformTranslate(0.0,  0.0, -50.0);
+
+    // 객체를 뒤로 40만큼 이동
+    // TransformObj->TransformTranslate(0.0,  0.0, -40.0);
+    // 카메라의 위치와 방향을 설정하는 코드
+    TransformObj->TransformSetMatrixMode(VIEW_MATRIX);
+    TransformObj->TransformLoadIdentity();
+    glm::vec3 eye(0.0f, 0.0f, 40.0f);      // 카메라 위치
+    glm::vec3 center(0.0f, 0.0f, 0.0f);    // 카메라가 바라보는 지점
+    glm::vec3 up(0.0f, 1.0f, 0.0f);        // 카메라의 위쪽 방향
+    TransformObj->TransformLookAt(&eye, &center, &up);
 
     TransformObj->TransformSetMatrixMode( MODEL_MATRIX );
     TransformObj->TransformLoadIdentity();
@@ -183,6 +192,7 @@ void Renderer::TouchEventRelease( float x, float y )
 
 void Renderer::initializeModels()
 {
+
     for( int i=0; i<RenderMemData.models.size();  i++ )
         RenderMemData.models.at(i)->InitModel();
 }

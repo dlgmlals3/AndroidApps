@@ -7,6 +7,6 @@ out vec4 VarColor;
 
 void main()
 {
-    gl_Position = MODELVIEWPROJECTIONMATRIX * vec4(VertexPosition,1.0);
+    gl_Position = MODELVIEWPROJECTIONMATRIX * vec4(VertexPosition, 1.0);
     VarColor    = vec4(VertexColor, 1.0);
 }
