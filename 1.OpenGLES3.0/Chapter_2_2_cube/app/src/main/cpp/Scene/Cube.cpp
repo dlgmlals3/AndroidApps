@@ -174,8 +174,9 @@ void Cube::Render()
             distance += 0.1;
     }
 
-    TransformObj->TransformTranslate(0.0f, 0.0f, 30.f);
-    TransformObj->TransformRotate(k++, 0, 1, 0);
+    // TransformObj->TransformTranslate(0.0f, 0.0f, 30.f);
+    // 행렬
+    TransformObj->TransformRotate(k++, 1, 1, 1);
     // TransformObj->PrintMatrixMode();
     RenderCubeOfCubes();
 }
@@ -190,6 +191,8 @@ void Cube::RenderCube()
 
 void Cube::RenderCubeOfCubes()
 {
+    RenderCube(); // dlgmlals3
+    /*
     TransformObj->TransformTranslate(-distance*dimension/2,  -distance*dimension/2, -distance*dimension/2);
     for (int i = 0; i < dimension; i++){
         TransformObj->TransformTranslate(distance,  0.0, 0.0);
@@ -207,5 +210,6 @@ void Cube::RenderCubeOfCubes()
         }
         TransformObj->TransformPopMatrix();
     }
+    */
 }
 

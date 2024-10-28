@@ -1,0 +1,68 @@
+[1mdiff --git a/1.OpenGLES3.0/Chapter_3_1/app/src/main/cpp/Scene/Cube.cpp b/1.OpenGLES3.0/Chapter_3_1/app/src/main/cpp/Scene/Cube.cpp[m
+[1mindex 61633ba..eda2628 100644[m
+[1m--- a/1.OpenGLES3.0/Chapter_3_1/app/src/main/cpp/Scene/Cube.cpp[m
+[1m+++ b/1.OpenGLES3.0/Chapter_3_1/app/src/main/cpp/Scene/Cube.cpp[m
+[36m@@ -66,7 +66,7 @@[m [mGLushort cubeIndices[] = {[m
+ 	\return None[m
+ [m
+ */[m
+[31m-/*[m
+[32m+[m
+ Cube::Cube( Renderer* parent )[m
+ {[m
+ 	if (!parent)[m
+[36m@@ -110,8 +110,8 @@[m [mCube::Cube( Renderer* parent )[m
+     // Use default VAO[m
+     glBindVertexArray(0);[m
+ }[m
+[31m-*/[m
+ [m
+[32m+[m[32m/*[m
+ Cube::Cube( Renderer* parent )[m
+ {[m
+ 	if (!parent)[m
+[36m@@ -150,15 +150,8 @@[m [mCube::Cube( Renderer* parent )[m
+ 	glBindBuffer( GL_ARRAY_BUFFER, 0 );[m
+ 	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );[m
+ }[m
+[31m-[m
+[31m-[m
+[31m-/*![m
+[31m-	Simple Destructor[m
+[31m-[m
+[31m-	\param[in] None.[m
+[31m-	\return None[m
+[31m-[m
+ */[m
+[32m+[m
+ Cube::~Cube()[m
+ {[m
+ 	PROGRAM* program = NULL;[m
+[36m@@ -248,7 +241,7 @@[m [mvoid Cube::Render()[m
+     //TransformObj->TransformRotate(degree++, 1, 1, 1);[m
+     RenderCube();[m
+ }[m
+[31m-/*[m
+[32m+[m
+ void Cube::RenderCube()[m
+ {[m
+ 	char uniform = ProgramManagerObj->ProgramGetUniformLocation( program, ( char* )"MODELVIEWPROJECTIONMATRIX" );[m
+[36m@@ -258,7 +251,8 @@[m [mvoid Cube::RenderCube()[m
+     glBindVertexArray(Vertex_VAO_Id);[m
+     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, (void*)0);[m
+ }[m
+[31m-*/[m
+[32m+[m[32m/*[m
+[32m+[m
+ void Cube::RenderCube()[m
+ {[m
+     glBindBuffer( GL_UNIFORM_BUFFER, UBO );[m
+[36m@@ -278,7 +272,7 @@[m [mvoid Cube::RenderCube()[m
+     glBindBuffer( GL_ARRAY_BUFFER, 0 );[m
+     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );[m
+ }[m
+[31m-[m
+[32m+[m[32m*/[m
+ /*![m
+  This function handle Touch event down action.[m
+ [m
