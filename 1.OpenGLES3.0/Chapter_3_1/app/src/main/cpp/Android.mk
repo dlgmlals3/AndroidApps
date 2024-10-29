@@ -26,6 +26,7 @@ LOCAL_SRC_FILES := NativeTemplate.cpp \
 	$(FRAMEWORK_DIR)/Transform.cpp \
     $(SCENE_DIR)/Model.cpp \
     $(SCENE_DIR)/CubeVAO.cpp \
+    $(SCENE_DIR)/Grid.cpp \
     $(SCENE_DIR)/Renderer.cpp \
     $(SCENE_DIR)/Triangle.cpp \
     $(SCENE_DIR)/Square.cpp \
