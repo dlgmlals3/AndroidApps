@@ -17,6 +17,10 @@ private:
     GLuint Vertex_VAO_Id;
     int size;
     float degree;
+
+    GLuint matrixId;
+    float l;
+    clock_t last;
     
 public:
     Cube( Renderer* parent = 0);
@@ -27,6 +31,7 @@ public:
     void Render();
     void PrintMat4(const glm::mat4& mat);
     void RenderCube();
+    void RenderCubeFixedColor();
     void CreateUniformBufferObject();
     void TouchEventDown( float x, float y );
 };

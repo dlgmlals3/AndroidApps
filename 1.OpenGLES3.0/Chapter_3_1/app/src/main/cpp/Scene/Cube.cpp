@@ -15,14 +15,15 @@
 #define FRAGMENT_SHADER_PRG			( char * )"VAOFragment.glsl"
 #else
 //#define VERTEX_SHADER_PRG			( char * )"shader/VAOVertex.glsl"
-//#define FRAGMENT_SHADER_PRG			( char * )"shader/VAOFragment.glsl"
-#define VERTEX_SHADER_PRG			( char * )"shader/UniformBlockVertex.glsl"
-#define FRAGMENT_SHADER_PRG			( char * )"shader/UniformBlockFragment.glsl"
+//#define FRAGMENT_SHADER_PRG		( char * )"shader/VAOFragment.glsl"
+//#define VERTEX_SHADER_PRG			( char * )"shader/UniformBlockVertex.glsl"
+//#define FRAGMENT_SHADER_PRG			( char * )"shader/UniformBlockFragment.glsl"
+#define VERTEX_SHADER_PRG			( char * )"shader/BufferMappingVertex.glsl"
+#define FRAGMENT_SHADER_PRG			( char * )"shader/BufferMappingFragment.glsl"
 #endif
 
 #define VERTEX_LOCATION 0
 #define COLOR_LOCATION 1
-
 // Namespace used
 bool Animate = true;
 // Global Object Declaration
@@ -38,7 +39,7 @@ GLfloat  cubeVerts[][3] = {
 };
 
 GLfloat  cubeColors[][3] = {
-    {  0.0,  0.0,  0.0 }, //0
+    {  0.5,  0.5,  0.5 }, //0
     {  0.0,  0.0,  1.0 }, //1
     {  0.0,  1.0,  0.0 }, //2
     {  0.0,  1.0,  1.0 }, //3
@@ -46,6 +47,17 @@ GLfloat  cubeColors[][3] = {
     {  1.0,  0.0,  1.0 }, //5
     {  1.0,  1.0,  0.0 }, //6
     {  1.0,  1.0,  1.0 }, //7
+};
+
+GLfloat  cubeColors2[][3] = {
+        {  0.5,  0.5,  0.5 }, //0
+        {  0.0,  0.0,  1.0 }, //1
+        {  0.0,  1.0,  0.0 }, //2
+        {  0.0,  1.0,  1.0 }, //3
+        {  1.0,  0.0,  0.0 }, //4
+        {  1.0,  0.0,  1.0 }, //5
+        {  1.0,  1.0,  0.0 }, //6
+        {  1.0,  1.0,  1.0 }, //7
 };
 
 // 36[ indices
@@ -60,47 +72,14 @@ GLushort cubeIndices[] = {
 
 Cube::Cube( Renderer* parent )
 {
-	if (!parent)
-		return;
-
-	RenderObj			= parent;
-	MapRenderHandler	= parent;
-	ProgramManagerObj	= parent->RendererProgramManager();
-	TransformObj		= parent->RendererTransform();
-	modelType 			= CubeType;
-
-    degree = 0;
-    // Create VBO
-	size = 24*sizeof(float);
-    glGenBuffers(1, &vId);
-	glBindBuffer( GL_ARRAY_BUFFER, vId );
-	glBufferData( GL_ARRAY_BUFFER, size + size, 0, GL_STATIC_DRAW );
-	glBufferSubData( GL_ARRAY_BUFFER, 0,			size,	cubeVerts );
-	glBufferSubData( GL_ARRAY_BUFFER, size,			size,	cubeColors );
-
-    // Create IBO
-	unsigned short indexSize = sizeof( unsigned short )*36;
-    glGenBuffers(1, &iId);
-	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, iId );
-	glBufferData( GL_ELEMENT_ARRAY_BUFFER, indexSize, 0, GL_STATIC_DRAW );
-    glBufferSubData( GL_ELEMENT_ARRAY_BUFFER, 0, indexSize,	cubeIndices );
-
-    // Generate and Bind the VAO ID
-    glGenVertexArrays(1, &Vertex_VAO_Id);
-    glBindVertexArray(Vertex_VAO_Id);
-
-    //Bind VBO ID and setup generic attributes
-	glBindBuffer( GL_ARRAY_BUFFER, vId );
-    glEnableVertexAttribArray(VERTEX_LOCATION);
-    glEnableVertexAttribArray(COLOR_LOCATION);
-    glVertexAttribPointer(VERTEX_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-    glVertexAttribPointer(COLOR_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, (void*)size);
-
-    // Bind IBO
-	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, iId );
-
-    // Use default VAO
-    glBindVertexArray(0);
+    if (!parent)
+        return;
+    
+    MapRenderHandler	= parent;
+    ProgramManagerObj	= parent->RendererProgramManager();
+    TransformObj		= parent->RendererTransform();
+    modelType 			= CubeType;
+    last                = clock();
 }
 
 Cube::~Cube()
@@ -143,40 +122,55 @@ void Cube::InitModel()
     if( !ProgramManagerObj->ProgramLink( program, 1 ) ) exit( 3 );
 
     glUseProgram( program->ProgramID );
+    
+    // Create VBO
+    size = sizeof(cubeVerts);
+    glGenBuffers(1, &vId);
+    glBindBuffer( GL_ARRAY_BUFFER, vId );
+    glBufferData( GL_ARRAY_BUFFER, size * 2, 0, GL_STATIC_DRAW );
+    glBufferSubData( GL_ARRAY_BUFFER, 0,			size,	cubeVerts );
+    glBufferSubData( GL_ARRAY_BUFFER, size,			size,	cubeColors );
 
-    CreateUniformBufferObject();
-
+    // Create IBO
+    unsigned short indexSize = sizeof( unsigned short )*36;
+    glGenBuffers(1, &iId);
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, iId );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, indexSize, 0, GL_STATIC_DRAW );
+    glBufferSubData( GL_ELEMENT_ARRAY_BUFFER, 0, indexSize,	cubeIndices );
+    
+    glGenVertexArrays(1, &Vertex_VAO_Id);
+    glBindVertexArray(Vertex_VAO_Id);
+    
+    // Create VBO  and set attribute parameters
+    glBindBuffer( GL_ARRAY_BUFFER, vId );
+    glEnableVertexAttribArray(VERTEX_LOCATION);
+    glEnableVertexAttribArray(COLOR_LOCATION);
+    glVertexAttribPointer(VERTEX_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glVertexAttribPointer(COLOR_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, (void*)size);
+    
+    // Bind IBO
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, iId );
+    
+    // Make sure the VAO is not changed from outside code
+    glBindVertexArray(0);
+    
     return;
 }
 
-void Cube::CreateUniformBufferObject()
-{
-    // Get the index of the uniform block
-    char blockIdx = glGetUniformBlockIndex(program->ProgramID, "Transformation");
-
-    // Buffer space allocation
-    GLint blockSize;
-    glGetActiveUniformBlockiv(program->ProgramID, blockIdx, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
-
-    //Bind the block index to BindPoint
-    GLint bindingPoint = 0;
-    glUniformBlockBinding(program->ProgramID, blockIdx, bindingPoint);
-
-    // Create Uniform Buffer Object(UBO) Handle
-    glGenBuffers(1, &UBO);
-    glBindBuffer(GL_UNIFORM_BUFFER, UBO);
-    glBufferData(GL_UNIFORM_BUFFER, blockSize, 0, GL_DYNAMIC_DRAW);
-
-    // Bind the UBO handle to BindPoint
-    glBindBufferBase(GL_UNIFORM_BUFFER, bindingPoint, UBO);
-}
-
+/*!
+	Initialize the scene, reserve shaders, compile and cache program
+ 
+	\param[in] None.
+	\return None
+ 
+ */
 void Cube::Render()
 {
+    glEnable( GL_DEPTH_TEST );
+    
     glUseProgram( program->ProgramID );
-	TransformObj->TransformTranslate(0.0,  0.0, -5.0);
-    TransformObj->TransformRotate(degree++, 1, 1, 1);
     RenderCube();
+    RenderCubeFixedColor();
 }
 
 void Cube::PrintMat4(const glm::mat4& mat) {
@@ -189,25 +183,51 @@ void Cube::PrintMat4(const glm::mat4& mat) {
     LOGI("\n");
 }
 
+void Cube::RenderCubeFixedColor() {
+/*    // Perform Transformation.
+    TransformObj->TransformPushMatrix();
+    TransformObj->TransformRotate(l++, 0.50, 0.60, 1.0);
+    char uniform = ProgramManagerObj->ProgramGetUniformLocation( program, (char*)"MODELVIEWPROJECTIONMATRIX");
+    if ( uniform >= 0 ){
+        glUniformMatrix4fv( uniform, 1, GL_FALSE,(float*)TransformObj->TransformGetModelViewProjectionMatrix() );
+    }
+    TransformObj->TransformPopMatrix();*/
+
+
+}
+
 void Cube::RenderCube()
 {
-    // LOGI("RenderCube Size  %d\n", size);
-    // ENABLE UBO
-    glBindBuffer( GL_UNIFORM_BUFFER, UBO );
-    glm::mat4* matrixBuf = (glm::mat4*)glMapBufferRange( GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4) * 3, GL_MAP_WRITE_BIT);
-    matrixBuf[0] = *(TransformObj->TransformGetModelMatrix());
-    matrixBuf[1] = *(TransformObj->TransformGetViewMatrix());
-    matrixBuf[2] = *(TransformObj->TransformGetProjectionMatrix());
-    glUnmapBuffer ( GL_UNIFORM_BUFFER );
+    glBindBuffer( GL_ARRAY_BUFFER, vId );
+    float* colorBuf = (float*)glMapBufferRange(GL_ARRAY_BUFFER, size, size, GL_MAP_WRITE_BIT);
+    for (int i=0; i < sizeof(cubeColors) / sizeof(float); i++) {
+        colorBuf[i] = float(rand()%255)/255;
+    }
+    glUnmapBuffer ( GL_ARRAY_BUFFER );
 
-    // UBO로 넘기는게 아니라 CPU에서 계산 다하고 Uniform 으로 넘기기
-    glm::mat4 mvp = matrixBuf[2] * matrixBuf[1] * matrixBuf[0];
-    // PrintMat4(mvp);
-    char uniform = ProgramManagerObj->ProgramGetUniformLocation( program, ( char* )"MODELVIEWPROJECTIONMATRIX" );
-    glUniformMatrix4fv( uniform, 1, GL_FALSE,(float*) &mvp);
+    // Perform Transformation.
+    TransformObj->TransformPushMatrix();
+    TransformObj->TransformRotate(l++, 0.50, 0.60, 1.0);
+    char uniform = ProgramManagerObj->ProgramGetUniformLocation( program, (char*)"MODELVIEWPROJECTIONMATRIX");
+    if ( uniform >= 0 ){
+        glUniformMatrix4fv( uniform, 1, GL_FALSE,(float*)TransformObj->TransformGetModelViewProjectionMatrix() );
+    }
+    TransformObj->TransformPopMatrix();
 
     glBindVertexArray(Vertex_VAO_Id);
+    glDrawElements(GL_POINTS, 36, GL_UNSIGNED_SHORT, (void*)0);
+
+    /*
+    두번째 렌더링
+    glBindBuffer( GL_ARRAY_BUFFER, vId );
+    colorBuf = (float*)glMapBufferRange(GL_ARRAY_BUFFER, size, size, GL_MAP_WRITE_BIT);
+    for (int i=0; i < sizeof(cubeColors) / sizeof(float); i++) {
+        colorBuf[i] = 1.0;
+    }
+    glUnmapBuffer ( GL_ARRAY_BUFFER );
+    glBindVertexArray(Vertex_VAO_Id);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, (void*)0);
+    */
 }
 
 void Cube::TouchEventDown( float x, float y )

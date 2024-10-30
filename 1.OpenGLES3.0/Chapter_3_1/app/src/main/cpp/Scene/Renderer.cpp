@@ -21,11 +21,9 @@ void Renderer::initializeRenderer()
 
 void Renderer::createModels()
 {
-    clearModels();
-    //addModel( new Cube	( this ) );
-	addModel( new Grid	( this ) );
-    //addModel( new Square ( this ) );
-    //addModel( new Triangle	( this ) );
+	clearModels();
+	addModel( new Cube	( this ) );
+	//addModel( new Triangle	( this ) );
 }
 
 /*!
