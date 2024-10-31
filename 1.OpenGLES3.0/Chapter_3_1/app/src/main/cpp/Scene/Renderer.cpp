@@ -1,5 +1,5 @@
 #include "Renderer.h"
-#include "Cube.h"
+#include "CubeInstance.h"
 #include "Triangle.h"
 #include "Square.h"
 #include "Grid.h"
@@ -22,7 +22,9 @@ void Renderer::initializeRenderer()
 void Renderer::createModels()
 {
 	clearModels();
-	addModel( new Cube	( this ) );
+    addModel( new Cube( this ) );
+    //addModel( new Cube	( this ) );
+
 	//addModel( new Triangle	( this ) );
 }
 
