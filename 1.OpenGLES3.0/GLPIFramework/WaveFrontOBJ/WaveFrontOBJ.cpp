@@ -214,14 +214,17 @@ bool OBJMesh::ScanVertexNormalAndUV( FILE* pFile, char c )
     {
         case ' ': // Loading vertices
             fscanf(pFile,"%f %f %f\n",&x,&y,&z);
+            //LOGI("Vertices : %f %f %f\n", x, y, z);
             objMeshModel.positions.push_back(glm::vec3(x, y, z));
             break;
         case 'n': // Loading normals
             fscanf(pFile,"%f %f %f\n",&x,&y,&z);
+            //LOGI("normals : %f %f %f\n", x, y, z);
             objMeshModel.normals.push_back(glm::vec3(x, y, z));
             break;
         case 't': // Loading UVs
             fscanf(pFile,"%f %f\n",&u,&v);
+            //LOGI("uvs : %f %f\n", x, y, z);
             objMeshModel.uvs.push_back(glm::vec2(u, v));
             break;
         default:
@@ -238,11 +241,11 @@ bool OBJMesh::ScanFaceIndex( FILE* pFile, char c )
     // If Normal and UV information availble. Format => v/u/n
     if ( objMeshModel.normals.size() && objMeshModel.uvs.size() )
     {
-        
         while(fgetc(pFile) != '\n'){
             vIndex = nIndex = uvIndex = 0;
             
             scanCount = fscanf(pFile,"%d/%d/%d",&vIndex,&uvIndex,&nIndex);
+
             if((scanCount != 3) || (vIndex == 0) || (uvIndex == 0) || (nIndex == 0))
             {
                 break;
@@ -258,6 +261,7 @@ bool OBJMesh::ScanFaceIndex( FILE* pFile, char c )
         while(fgetc(pFile) != '\n'){
             vIndex = nIndex = uvIndex = 0;
             scanCount = fscanf(pFile,"%d//%d",&vIndex, &nIndex);
+
             if((scanCount != 2) || (vIndex == 0) || (nIndex == 0))
             {
                 break;
@@ -273,6 +277,7 @@ bool OBJMesh::ScanFaceIndex( FILE* pFile, char c )
         while(fgetc(pFile) != '\n'){
             vIndex = nIndex = uvIndex = 0;
             scanCount = fscanf(pFile,"%d/%d/",&vIndex, &uvIndex);
+
             if((scanCount != 2) || (vIndex == 0) || (uvIndex == 0))
             {
                 break;
@@ -285,9 +290,11 @@ bool OBJMesh::ScanFaceIndex( FILE* pFile, char c )
     // If both Normal and UV information missing. Format => v
     else if( !objMeshModel.normals.size() && !objMeshModel.uvs.size() )
     {
+        // LOGI("ScanFaceIndex : %d %d", objMeshModel.normals.size() ,objMeshModel.uvs.size() );
         vIndex = nIndex = uvIndex = 0;
         while(fgetc(pFile) != '\n'){
             scanCount = fscanf(pFile,"%d",&vIndex);
+
             if((scanCount != 1) || (vIndex == 0))
             {
                 break;
@@ -310,14 +317,14 @@ bool OBJMesh::ParseFileInfo(char* path)
     if( pFile==NULL )
     {
         LOGI("\nFail to open Obj mesh file: %s", path);
-        fclose (pFile);
         return false;
     }
     
     strcpy(objMeshModel.fileName, path);
-    while(!eofReached)
+
+    while ((c = fgetc(pFile)) != EOF || !feof(pFile))
     {
-        c = fgetc(pFile);
+        // LOGI("character : %c", c);
         switch(c)
         {
             case '#': // Comment. Ignore
@@ -326,15 +333,7 @@ bool OBJMesh::ParseFileInfo(char* path)
             case 'g': // Grouping not supported
                 while(fgetc(pFile) != '\n'); // Skip till new next line not reached.
                 break;
-                
-#ifdef __IPHONE_4_0
-			case EOF:
-#else
-			case (unsigned char)EOF:
-#endif
-                eofReached = true;
-                break;
-                
+
             case 'v': // Loading the vertices.
                 c = fgetc(pFile); // The next character will let us know what vertex attribute to load
                 ScanVertexNormalAndUV( pFile, c );
@@ -345,6 +344,7 @@ bool OBJMesh::ParseFileInfo(char* path)
                 break;
         }
     }
+    // LOGI("FINISH PARSING");
     fclose (pFile);
     return true;
 }
