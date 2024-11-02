@@ -5,6 +5,7 @@ SCENE_DIR = ${MY_CUR_LOCAL_PATH}/Scene
 GLM_SRC_PATH = $(FRAMEWORK_DIR)/glm
 ZLIB_DIR = $(FRAMEWORK_DIR)/zlib
 WAVEFRONTOBJ_LIB_PATH = ${FRAMEWORK_DIR}/WaveFrontOBJ
+LIB3DS_DIR = $(FRAMEWORK_DIR)/3DSParser
 
 include $(CLEAR_VARS)
 include $(FRAMEWORK_DIR)/zlib/Android.mk
@@ -18,10 +19,10 @@ LOCAL_C_INCLUDES := $(GLM_SRC_PATH)/core \
 		$(GLM_SRC_PATH)/gtx \
 		$(GLM_SRC_PATH)/virtrev \
 		$(ZLIB_DIR) \
+        $(LIB3DS_DIR) \
 		$(FRAMEWORK_DIR) \
 		${WAVEFRONTOBJ_LIB_PATH} \
 		$(SCENE_DIR)
-
 
 LOCAL_SRC_FILES := NativeTemplate.cpp \
     $(FRAMEWORK_DIR)/Cache.cpp \

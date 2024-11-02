@@ -2,10 +2,11 @@
 #include "Triangle.h"
 #include "Square.h"
 #include "ObjLoader.h"
+#include "3DSLoader.h"
 
 Renderer::Renderer(void)
 {
-    RenderMemData.isPerspective = false;
+	RenderMemData.isPerspective = true;
 }
 
 Renderer::~Renderer(void)
@@ -25,7 +26,11 @@ void Renderer::initializeRenderer()
 void Renderer::createModels()
 {
 	clearModels();
-    addModel( new ObjLoader	( this ) );
+	Transform*	TransformObj = &RenderMemData.TransformObj;
+	TransformObj->TransformInit();
+    // dlgmlals3
+   	//addModel( new Loader3DS	( this ) );
+	addModel( new ObjLoader	( this ) );
     //addModel( new Square	( this ) );
 }
 
@@ -58,7 +63,6 @@ void Renderer::setUpProjection()
     ProgramManager* ProgramManagerObj	= &RenderMemData.ProgramManagerObj;
     Transform*	TransformObj			= &RenderMemData.TransformObj;
     bool considerAspectRatio			= true;
-    RenderMemData.isPerspective			= true;
     float span							= 10.0;
 
     TransformObj->TransformInit();
@@ -90,7 +94,12 @@ void Renderer::setUpProjection()
 	}
 	TransformObj->TransformSetMatrixMode( VIEW_MATRIX );
 	TransformObj->TransformLoadIdentity();
-
+    /*
+    TransformObj->TransformTranslate(0.0, 0.0, -10);
+    TransformObj->TransformRotate(30, 1.0, 0.0, 0.0);
+    static float rot;
+    TransformObj->TransformRotate(rot++, 0.0, 1.0, 0.0);
+    */
     TransformObj->TransformSetMatrixMode( MODEL_MATRIX );
     TransformObj->TransformLoadIdentity();
 }
