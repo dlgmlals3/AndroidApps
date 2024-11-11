@@ -26,12 +26,7 @@ void Renderer::initializeRenderer()
 void Renderer::createModels()
 {
 	clearModels();
-	Transform*	TransformObj = &RenderMemData.TransformObj;
-	TransformObj->TransformInit();
-    // dlgmlals3
-   	//addModel( new Loader3DS	( this ) );
 	addModel( new ObjLoader	( this ) );
-    //addModel( new Square	( this ) );
 }
 
 /*!
@@ -94,13 +89,9 @@ void Renderer::setUpProjection()
 	}
 	TransformObj->TransformSetMatrixMode( VIEW_MATRIX );
 	TransformObj->TransformLoadIdentity();
-    /*
-    TransformObj->TransformTranslate(0.0, 0.0, -10);
-    TransformObj->TransformRotate(30, 1.0, 0.0, 0.0);
-    static float rot;
-    TransformObj->TransformRotate(rot++, 0.0, 1.0, 0.0);
-    */
-    TransformObj->TransformSetMatrixMode( MODEL_MATRIX );
+    TransformObj->TransformTranslate(0,0,-4);
+
+	TransformObj->TransformSetMatrixMode( MODEL_MATRIX );
     TransformObj->TransformLoadIdentity();
 }
 
@@ -169,6 +160,13 @@ void Renderer::addModel(Model* model)
     RenderMemData.models.push_back( model );
 }
 
+/*!
+	This function handle Touch event down action.
+
+	\param[in] x and y screen pixel position.
+
+	\return None.
+*/
 void Renderer::TouchEventDown( float x, float y )
 {
 	for( int i=0; i<RenderMemData.models.size(); i++ ){
@@ -183,6 +181,13 @@ void Renderer::TouchEventDoubleClick( float x, float y )
     }
 }
 
+/*!
+	This function handle Touch event move action.
+
+	\param[in] x and y screen pixel position.
+
+	\return None.
+*/
 void Renderer::TouchEventMove( float x, float y )
 {
     for( int i=0; i<RenderMemData.models.size(); i++ ){
@@ -190,7 +195,13 @@ void Renderer::TouchEventMove( float x, float y )
     }
 }
 
+/*!
+	This function handle Touch event release action.
 
+	\param[in] x and y screen pixel position.
+
+	\return None.
+*/
 void Renderer::TouchEventRelease( float x, float y )
 {
     for( int i=0; i<RenderMemData.models.size(); i++ ){
@@ -199,13 +210,27 @@ void Renderer::TouchEventRelease( float x, float y )
 }
 
 
+/*!
+	Performs initializing of all the models this may include setup for shaders their caching.
+	rendering for each model, creation and caching of IBO, VBO, FBO etc.
+
+	\param[in] void.
+
+	\return void.
+*/
 void Renderer::initializeModels()
 {
-    for( int i=0; i<RenderMemData.models.size();  i++ )
+	for( int i=0; i<RenderMemData.models.size();  i++ )
         RenderMemData.models.at(i)->InitModel();
 }
 
+/*!
+	Performs rendering for each model
 
+	\param[in] void.
+
+	\return void.
+*/
 void Renderer::render()
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);

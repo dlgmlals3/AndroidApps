@@ -10,8 +10,8 @@
 //#import <fstream>
 using namespace glm;
 
-#define VERTEX_SHADER_PRG			( char * )"shader/VertexObj.glsl"
-#define FRAGMENT_SHADER_PRG			( char * )"shader/FragmentObj.glsl"
+#define VERTEX_SHADER_PRG			( char * )"shader/PhongShadeVertex.glsl"
+#define FRAGMENT_SHADER_PRG			( char * )"shader/PhongShadeFragment.glsl"
 
 #define VERTEX_POSITION 0
 #define NORMAL_POSITION 1
@@ -22,9 +22,9 @@ int stride;
 GLvoid* offset;
 GLvoid* offsetTexCoord;
 char MVP;
-//char MV;
-//GLint NormalMatrix;
-
+char MV;
+GLint NormalMatrix;
+int ModelNumber = 0;
 GLuint vertexBuffer;
 
 // Namespace used
@@ -34,8 +34,6 @@ using std::ostringstream;
 // Model Name Array
 #define STRING_LENGTH 100
 
-// dlgmlals3
-int ModelNumber = 0;
 char ModelNames[][STRING_LENGTH]= {"Cone.obj", "Sphere.obj", "Torus.obj", "Monkey.obj", "IsoSphere.obj"};
 
 /*!
@@ -168,15 +166,57 @@ void ObjLoader::InitModel()
     if( !ProgramManagerObj->ProgramLink( program, 1 ) ) exit( 3 );
 
     glUseProgram( program->ProgramID );
-
-    char MaterialDiffuse  = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"MaterialDiffuse");
-    glm::vec3 color = glm::vec3(1.0, 0.5, 0.0) * 0.75f;
-    if (MaterialDiffuse >= 0){
-        glUniform3f(MaterialDiffuse, color.r, color.g, color.b);
+    
+    // Get Material property uniform variables
+    char MaterialAmbient  = ProgramManagerObj->ProgramGetUniformLocation(program,(char*)"MaterialAmbient");
+    char MaterialSpecular = ProgramManagerObj->ProgramGetUniformLocation(program,(char*)"MaterialSpecular");
+    char MaterialDiffuse  = ProgramManagerObj->ProgramGetUniformLocation(program,(char*)"MaterialDiffuse");
+    char ShininessFactor  = ProgramManagerObj->ProgramGetUniformLocation(program,(char*)"ShininessFactor");
+    
+    // Get Light property uniform variables
+    char LightAmbient     = ProgramManagerObj->ProgramGetUniformLocation(program,(char*)"LightAmbient");
+    char LightSpecular    = ProgramManagerObj->ProgramGetUniformLocation(program,(char*)"LightSpecular");
+    char LightDiffuse     = ProgramManagerObj->ProgramGetUniformLocation(program,(char*)"LightDiffuse");
+    char LightPosition     = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"LightPosition");
+    
+    if ( MaterialAmbient >= 0 ){
+        glUniform3f(MaterialAmbient, 0.1f, 0.1f, 0.1f);
+    }
+    
+    if ( MaterialSpecular >= 0){
+        glUniform3f( MaterialSpecular, 1.0, 0.5, 0.5 );
+    }
+    
+    if ( MaterialDiffuse >= 0 ){
+        glm::vec3 color = glm::vec3(0.75, 0.375, 0.0);
+        glUniform3f( MaterialDiffuse, color.r, color.g, color.b );
     }
 
-    MVP     = ProgramManagerObj->ProgramGetUniformLocation( program, ( char* )"MODELVIEWPROJECTIONMATRIX" );
+    if ( LightAmbient >= 0 ){
+        glUniform3f( LightAmbient, 1.0f, 1.0f, 1.0f );
+    }
+    
+    if ( LightSpecular >=  0 ){
+        glUniform3f( LightSpecular, 1.0, 1.0, 1.0 );
+    }
 
+    if ( LightDiffuse >= 0 ){
+        glUniform3f(LightDiffuse, 1.0f, 0.0f, 1.0f);
+    }
+
+    if ( ShininessFactor >= 0 ){
+        glUniform1f(ShininessFactor, 40);
+    }
+
+    if ( LightPosition >= 0 ){
+        glm::vec3 lightPosition(0.0, 10.0, 0);
+        glUniform3fv(LightPosition, 1, (float*)&lightPosition);
+    }
+    
+    MVP = ProgramManagerObj->ProgramGetUniformLocation( program, ( char* )"ModelViewProjectionMatrix" );
+    MV  = ProgramManagerObj->ProgramGetUniformLocation( program, ( char* )"ModelViewMatrix" );
+    NormalMatrix  = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"NormalMatrix");
+    
     return;
 }
 
@@ -191,30 +231,25 @@ void ObjLoader::Render()
 {
     // Use Ambient program
     glUseProgram(program->ProgramID);
-
+    
     // Apply Transformation.
 	TransformObj->TransformPushMatrix();
-	TransformObj->TransformTranslate(0,0,-3);
-	TransformObj->TransformScale(1.0,1.0,1.0);
     static float rot = 0.0;
 	TransformObj->TransformRotate(rot++ , 1.0, 1.0, 1.0);
-    glUniformMatrix4fv( MVP, 1, GL_FALSE,( float * )TransformObj->TransformGetModelViewProjectionMatrix() );
-	TransformObj->TransformPopMatrix();
 
+    glUniformMatrix4fv( MVP, 1, GL_FALSE,( float * )TransformObj->TransformGetModelViewProjectionMatrix() );
+    glUniformMatrix4fv( MV, 1, GL_FALSE,( float * )TransformObj->TransformGetModelViewMatrix() );
+    glm::mat4 matrix    = *(TransformObj->TransformGetModelViewMatrix());
+    glm::mat3 normalMat = glm::transpose(glm::inverse(glm::mat3(matrix)));
+    glUniformMatrix3fv( NormalMatrix, 1, GL_FALSE, (float*)&normalMat );
+    TransformObj->TransformPopMatrix();
+    
     // Bind with Vertex Array Object for OBJ
     glBindVertexArray(OBJ_VAO_Id);
     
     // Draw Geometry
-    if ( RenderPrimitive == 0 ){
-        glDrawArrays(GL_POINTS, 0, IndexCount );
-    }
-    else if ( RenderPrimitive == 1 ){
-        glDrawArrays(GL_LINES, 0, IndexCount );
-    }
-    else{
-        glDrawArrays(GL_TRIANGLES, 0, IndexCount );
-    }
-
+    glDrawArrays(GL_TRIANGLES, 0, IndexCount );
+    
     glBindVertexArray(0);
 }
 
