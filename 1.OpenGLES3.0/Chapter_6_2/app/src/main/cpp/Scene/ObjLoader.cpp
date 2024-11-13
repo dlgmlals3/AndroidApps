@@ -10,8 +10,10 @@
 //#import <fstream>
 using namespace glm;
 
-#define VERTEX_SHADER_PRG			( char * )"shader/CircleVertexShader.glsl"
-#define FRAGMENT_SHADER_PRG			( char * )"shader/CircleFragmentShader.glsl"
+#define VERTEX_SHADER_PRG			( char * )"shader/BrickVertex.glsl"
+#define FRAGMENT_SHADER_PRG			( char * )"shader/BrickFragment.glsl"
+//#define VERTEX_SHADER_PRG			( char * )"shader/CircleVertexShader.glsl"
+//#define FRAGMENT_SHADER_PRG			( char * )"shader/CircleFragmentShader.glsl"
 
 #define VERTEX_POSITION 0
 #define NORMAL_POSITION 1
@@ -28,7 +30,7 @@ GLint timer;
 float timeUpdate = 0.0, lastUpdate = 0.0;
 GLint toggleWobble;
 bool toggle = true;
-int ModelNumber = 2;
+int ModelNumber = 1;
 GLuint vertexBuffer;
 
 // Namespace used
@@ -75,11 +77,6 @@ void ObjLoader::SwitchMesh()
     // Get the new mesh model number
     ModelNumber++;
     ModelNumber %= sizeof(ModelNames)/(sizeof(char)*STRING_LENGTH);
-    
-    if (!toggle) {
-        // Demostrating Ripple shader using Plane mesh
-        ModelNumber = 4;
-    }
     
     // Load the new mesh model
     LoadMesh();
@@ -185,19 +182,16 @@ void ObjLoader::InitModel()
     char LightDiffuse      = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"LightDiffuse");
     char ShininessFactor   = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"ShininessFactor");
     char LightPosition     = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"LightPosition");
-    char ModelColor        = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"ModelColor");
-    char DotColor          = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"DotColor");
-    char Side              = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"Side");
     
     if (MaterialAmbient >= 0){
-        glUniform3f(MaterialAmbient, 0.04f, 0.04f, 0.04f);
+        glUniform3f(MaterialAmbient, 0.40f, 0.40f, 0.40f);
     }
     
     if (MaterialSpecular >= 0){
         glUniform3f(MaterialSpecular, 1.0, 1.0, 1.0);
     }
     
-    glm::vec3 color = glm::vec3(1.0, 1.0, 0.0);
+    glm::vec3 color = glm::vec3(1.0, 1.0, 1.0);// * 0.75f;
     if (MaterialDiffuse >= 0){
         glUniform3f(MaterialDiffuse, color.r, color.g, color.b);
     }
@@ -217,23 +211,28 @@ void ObjLoader::InitModel()
     if ( ShininessFactor >= 0 ){
         glUniform1f(ShininessFactor, 40);
     }
-
-    if ( LightPosition >= 0 ){
-        glm::vec3 lightPosition(0.0, 5.0, 10);
-        glUniform3fv(LightPosition, 1, (float*)&lightPosition);
-    }
-    if ( ModelColor >= 0 ){
-        glm::vec3 mColor(0.50, 0.50, 1.0);
-        glUniform3fv(ModelColor, 1, (float*)&mColor);
-    }
-
-    if ( DotColor >= 0 ){
-        glm::vec3 dColor(1.0, 1.0, 10);
-        glUniform3fv(DotColor, 1, (float*)&dColor);
-    }
     
-    if ( Side >= 0 ){
-        glUniform1f(Side, 80);
+    if (LightPosition >= 0){
+        glUniform3f(LightPosition, 0.0, 10.0, 10.0 );
+    }
+
+    // Brick parameters
+    char BrickColor     = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"BrickColor");
+    char MortarColor    = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"MortarColor");
+    char RectangularSize= ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"RectangularSize");
+    char BrickPercent   = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"BrickPercent");
+
+    if (BrickColor >= 0){
+        glUniform3f(BrickColor, 1.0, 0.3, 0.2 );
+    }
+    if (MortarColor >= 0){
+        glUniform3f(MortarColor, 0.85, 0.86, 0.84 );
+    }
+    if (RectangularSize >= 0){
+        glUniform2f(RectangularSize, 0.40, 0.10 );
+    }
+    if (BrickPercent >= 0){
+        glUniform2f(BrickPercent, 0.90, 0.85 );
     }
     
 
@@ -253,14 +252,14 @@ void ObjLoader::InitModel()
 */
 void ObjLoader::Render()
 {
-    // Use Ambient program
+    glDisable(GL_CULL_FACE);
+    // Use Specular program
     glUseProgram(program->ProgramID);
     
     // Apply Transformation.
-    TransformObj->TransformPushMatrix();
-    TransformObj->TransformTranslate(0,0,-3);
+	TransformObj->TransformPushMatrix();
     static float rot = 0.0;
-	TransformObj->TransformRotate(rot++ , 1.0, 0.5, 0.80);
+	TransformObj->TransformRotate(rot++ , 1.0, 1.0, 1.0);
     glUniformMatrix4fv( MVP, 1, GL_FALSE,( float * )TransformObj->TransformGetModelViewProjectionMatrix() );
     glUniformMatrix4fv( MV, 1, GL_FALSE,( float * )TransformObj->TransformGetModelViewMatrix() );
     glm::mat4 matrix    = *(TransformObj->TransformGetModelViewMatrix());
@@ -273,6 +272,7 @@ void ObjLoader::Render()
     
     // Draw Geometry
     glDrawArrays(GL_TRIANGLES, 0, IndexCount );
+    
     glBindVertexArray(0);
 }
 
