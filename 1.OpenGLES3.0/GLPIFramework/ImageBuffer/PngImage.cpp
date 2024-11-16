@@ -129,6 +129,8 @@ unsigned char* PngImage::read_png_file(char* file_name)
 //! Load the bitmap file helper.
 bool PngImage::loadImage(char* fileName, bool generateTexID, GLenum target )
 {
+    LOGI("LoadImage : %s", fileName);
+
     // Get the image bits from the png file.
 	memData.bitsraw = read_png_file( fileName);
 
