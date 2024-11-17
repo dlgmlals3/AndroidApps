@@ -49,7 +49,17 @@ private:
     unsigned char RenderPrimitive;
     
     // Number of vertex Indices
-    int IndexCount;    
+    int IndexCount;
+    
+    GLuint OBJ_VAO_Id;
+    int stride;
+    GLvoid* offset;
+    
+    char MVP;
+    char M;
+    GLint NormalMatrix;
+    int ModelNumber;
+    GLuint vertexBuffer;
 };
 
 #endif // OBJLOADER_H

@@ -1,21 +1,15 @@
 #include "Renderer.h"
-#include "Triangle.h"
-#include "SimpleTexture.h"
-#include "Square.h"
 #include "ObjLoader.h"
 #include "Skybox.h"
 
 Renderer::Renderer(void)
 {
 	RenderMemData.isPerspective = true;
+    setCameraPosition(glm::vec3(0.0, 0.0, 5.0));
 }
 
 Renderer::~Renderer(void)
 {
-}
-
-void Renderer::SetModelPath(string path) {
-    modelPath = path;
 }
 
 void Renderer::initializeRenderer()
@@ -26,9 +20,9 @@ void Renderer::initializeRenderer()
 
 void Renderer::createModels()
 {
-	RenderMemData.TransformObj.TransformInit();
 	clearModels();
 	addModel( new Skybox	( this ) );
+	addModel( new ObjLoader	( this ) );
 }
 
 /*!
@@ -62,6 +56,8 @@ void Renderer::setUpProjection()
 	bool considerAspectRatio			= true;
 	float span							= 10.0;
 
+	TransformObj->TransformInit();
+
 	TransformObj->TransformSetMatrixMode( PROJECTION_MATRIX );
 
 	TransformObj->TransformLoadIdentity();
@@ -69,7 +65,7 @@ void Renderer::setUpProjection()
 	if ( considerAspectRatio ){
 		GLfloat aspectRatio = (GLfloat)RenderMemData.screenWidth / (GLfloat)RenderMemData.screenHeight;
 		if ( RenderMemData.isPerspective ){
-			TransformObj->TransformSetPerspective(60.0f, aspectRatio, 0.01, 1000, 0);
+			TransformObj->TransformSetPerspective(60.0f, aspectRatio, 0.01, 100, 0);
 		}else{
 			if ( RenderMemData.screenWidth <= RenderMemData.screenHeight ){
 				TransformObj->TransformOrtho( -span, span, -span / aspectRatio, span / aspectRatio, -span, span);
@@ -81,7 +77,7 @@ void Renderer::setUpProjection()
 	}
 	else{
 		if ( RenderMemData.isPerspective ){
-			TransformObj->TransformSetPerspective(60.0f, 1, 1.0, 1000, 0);
+			TransformObj->TransformSetPerspective(60.0f, 1, 1.0, 100, 0);
 		}
 		else{
 			TransformObj->TransformOrtho( -span, span, -span, span, -span, span );
@@ -90,9 +86,9 @@ void Renderer::setUpProjection()
 
 	TransformObj->TransformSetMatrixMode( VIEW_MATRIX );
 	TransformObj->TransformLoadIdentity();
-    TransformObj->TransformTranslate( 0, 0, -5);
+    TransformObj->TransformTranslate( RenderMemData.cameraPosition.x, RenderMemData.cameraPosition.y, RenderMemData.cameraPosition.z);//#N
 
-
+    
 	TransformObj->TransformSetMatrixMode( MODEL_MATRIX );
 	TransformObj->TransformLoadIdentity();
 }
@@ -235,7 +231,7 @@ void Renderer::initializeModels()
 */
 void Renderer::render()
 {
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 	for( int i=0; i<RenderMemData.models.size();  i++ ){

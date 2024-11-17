@@ -14,7 +14,7 @@ class Model
 {
 public:
 	Model(){}
-	virtual ~Model() {}
+	virtual ~Model(){}
     /*!
       Load textures, initialize shaders, etc.
       */
@@ -60,6 +60,7 @@ public:
 	virtual void TouchEventDown( float a, float b ){}
 	virtual void TouchEventDoubleClick( float a, float b ){}
 	virtual void TouchEventMove( float a, float b ){}
+
 	virtual void TouchEventRelease( float a, float b ){}
 
 

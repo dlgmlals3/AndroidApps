@@ -34,12 +34,12 @@ unsigned int idx = 0;
 GLfloat  cubeVerts[][3] = {
 	-1,-1, 1 , // V0
 	-1, 1, 1 , // V1
-    1, 1, 1 , // V2
-    1,-1, 1 , // V3
+	 1, 1, 1 , // V2
+	 1,-1, 1 , // V3
 	-1,-1,-1 , // V4
 	-1, 1,-1 , // V5
-    1, 1,-1 , // V6
-    1,-1,-1   // V7
+	 1, 1,-1 , // V6
+	 1,-1,-1   // V7
 };
 
 GLushort cubeIndices[] = {
@@ -66,8 +66,8 @@ Skybox::Skybox( Renderer* parent )
 {
 	if (!parent)
 		return;
-    
-	RendererHandler     = parent;
+
+	RendererHandler	= parent;
 	ProgramManagerObj	= parent->RendererProgramManager();
 	TransformObj		= parent->RendererTransform();
 	modelType 			= CubeType;
@@ -75,11 +75,11 @@ Skybox::Skybox( Renderer* parent )
 	
 	size = 24*sizeof(float);
     glGenBuffers(1, &vId);
-    
+
 	glBindBuffer( GL_ARRAY_BUFFER, vId );
 	glBufferData( GL_ARRAY_BUFFER, size, 0, GL_STATIC_DRAW );
 	glBufferSubData( GL_ARRAY_BUFFER, 0,			size,	cubeVerts );
-    
+
 	unsigned short indexSize = sizeof( unsigned short )*36;
     glGenBuffers(1, &iId);
 	glBindBuffer( GL_ARRAY_BUFFER, iId );
@@ -123,40 +123,37 @@ void Skybox::InitModel()
 {
 	ProgramManager* ProgramManagerObj   = RendererHandler->RendererProgramManager();
 	Transform*	TransformObj            = RendererHandler->RendererTransform();
-    
-    
+
+
 	if (! ( program = ProgramManagerObj->Program( ( char * )"Cube" ) ) )
 	{
 		program = ProgramManagerObj->ProgramInit( ( char * )"Cube" );
 		ProgramManagerObj->AddProgram( program );
 	}
-    
+
 	program->VertexShader		= ShaderManager::ShaderInit( VERTEX_SHADER_PRG,	GL_VERTEX_SHADER	);
-    
+
 	program->FragmentShader	= ShaderManager::ShaderInit( FRAGMENT_SHADER_PRG, GL_FRAGMENT_SHADER	);
-    
+
     //////////////////////////////////////////////////////
     /////////// Vertex shader //////////////////////////
     //////////////////////////////////////////////////////
 	CACHE *m = reserveCache( VERTEX_SHADER_PRG, true );
-    
+
 	if( m ) {
 		if( !ShaderManager::ShaderCompile( program->VertexShader, ( char * )m->buffer, 1 ) ) exit( 1 );
         m = freeCache( m );
 	}
-    
-    //////////////////////////////////////////////////////
-    /////////// Fragment shader //////////////////////////
-    //////////////////////////////////////////////////////
+
 	m = reserveCache( FRAGMENT_SHADER_PRG, true );
 	if( m ) {
 		if( !ShaderManager::ShaderCompile( program->FragmentShader, ( char * )m->buffer, 1 ) ) exit( 2 );
         m = freeCache( m );
 	}
-    
-    
+
+
     if( !ProgramManagerObj->ProgramLink( program, 1 ) ) exit( 3 );
-    
+
     glUseProgram( program->ProgramID );
     MVP = ProgramManagerObj->ProgramGetUniformLocation( program, ( char* )"MVP" );
     createCubeMap();
@@ -174,10 +171,9 @@ void Skybox::Render()
 {
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
-    
+
     glUseProgram( program->ProgramID );
 	TransformObj->TransformPushMatrix();
-	TransformObj->TransformRotate(k++, 0.0, 1.0, 0.0);
 	TransformObj->TransformScale(10.0f, 10.0f, 10.0f);
     glUniformMatrix4fv( MVP, 1, GL_FALSE,( float * )TransformObj->TransformGetModelViewProjectionMatrix() );
 	TransformObj->TransformPopMatrix();
@@ -185,7 +181,7 @@ void Skybox::Render()
     glBindBuffer( GL_ARRAY_BUFFER, vId );
     glEnableVertexAttribArray(VERTEX_POSITION);
     glVertexAttribPointer(VERTEX_POSITION, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-    
+
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, iId );
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, (void*)0);
 }
@@ -216,7 +212,7 @@ void Skybox::createCubeMap()
     image->loadImage(creatPath(fname, (char*)"Bottom.png"), false, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y);
     image->loadImage(creatPath(fname, (char*)"Front.png"),  false, GL_TEXTURE_CUBE_MAP_POSITIVE_Z);
     image->loadImage(creatPath(fname, (char*)"Back.png"),   false, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z);
-    
+
     glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);

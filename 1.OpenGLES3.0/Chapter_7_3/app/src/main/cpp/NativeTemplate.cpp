@@ -12,7 +12,7 @@
 static clock_t clickTimeDiff;
 
 void SetModelPath(std::string path){
-    Renderer::Instance().SetModelPath(path);
+    //Renderer::Instance().SetModelPath(path);
 }
 
 bool GraphicsInit()

@@ -10,35 +10,20 @@
 //#import <fstream>
 using namespace glm;
 
-#define VERTEX_SHADER_PRG			( char * )"shader/DiscardFragVertex.glsl"
-#define FRAGMENT_SHADER_PRG			( char * )"shader/DiscardFragFragment.glsl"
+//Note: The Linux is very case sensitive so be aware of specifying correct folder and filename.
+#ifdef __IPHONE_4_0
+#define VERTEX_SHADER_PRG			( char * )"RefractionVertex.glsl"
+#define FRAGMENT_SHADER_PRG			( char * )"RefractionFragment.glsl"
+#else
+#define VERTEX_SHADER_PRG			( char * )"shader/RefractionVertex.glsl"
+#define FRAGMENT_SHADER_PRG		( char * )"shader/RefractionFragment.glsl"
+//#define VERTEX_SHADER_PRG			( char * )"shader/ReflectionVertex.glsl"
+//#define FRAGMENT_SHADER_PRG			( char * )"shader/ReflectionFragment.glsl"
+#endif
 
-//#define VERTEX_SHADER_PRG			( char * )"shader/BrickVertex.glsl"
-//#define FRAGMENT_SHADER_PRG			( char * )"shader/BrickFragment.glsl"
-//#define VERTEX_SHADER_PRG			( char * )"shader/CircleVertexShader.glsl"
-//#define FRAGMENT_SHADER_PRG			( char * )"shader/CircleFragmentShader.glsl"
 
 #define VERTEX_POSITION 0
 #define NORMAL_POSITION 1
-#define TEX_COORD 2
-
-GLuint OBJ_VAO_Id;
-int stride;
-GLvoid* offset;
-GLvoid* offsetTexCoord;
-char MVP;
-char MV;
-GLint NormalMatrix;
-GLint timer;
-float timeUpdate = 0.0, lastUpdate = 0.0;
-GLint toggleIndex;
-bool toggle = true;
-int ModelNumber = 1;
-GLuint vertexBuffer;
-
-// Namespace used
-using std::ifstream;
-using std::ostringstream;
 
 // Model Name Array
 #define STRING_LENGTH 100
@@ -57,11 +42,11 @@ ObjLoader::ObjLoader( Renderer* parent )
 	if (!parent)
 		return;
 
-	MapRenderHandler	= parent;
+	RendererHandler	= parent;
 	ProgramManagerObj	= parent->RendererProgramManager();
 	TransformObj		= parent->RendererTransform();
 	modelType 			= ObjFileType;
-    timeUpdate          = lastUpdate = clock();
+    ModelNumber         = 0; // dlgmlals3
     glEnable	( GL_DEPTH_TEST );
     
     LoadMesh();
@@ -89,19 +74,16 @@ void ObjLoader::SwitchMesh()
 void ObjLoader::LoadMesh()
 {
     char fname[MAX_PATH]= {""};
-    strcpy( fname, "/storage/emulated/0/Android/data/cookbook.opengles_7/files/" );
+    strcpy( fname, "/storage/emulated/0/Android/data/cookbook.opengles_7_3/files/" );
     strcat( fname, ModelNames[ModelNumber]);
-    LOGI("LOAD Model name : %s", fname);
-
+    
     objMeshModel    = waveFrontObjectModel.ParseObjModel(fname);
     IndexCount      = waveFrontObjectModel.IndexTotal();
 
     stride          = (2 * sizeof(vec3) )+ sizeof(vec2) + sizeof(vec4);
     offset          = ( GLvoid*) ( sizeof(glm::vec3) + sizeof(vec2) );
-    offsetTexCoord  = ( GLvoid*) ( sizeof(glm::vec3) );
-
+    
     // Create the VBO for our obj model vertices.
-    GLuint vertexBuffer;
     glGenBuffers(1, &vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, objMeshModel->vertices.size() * sizeof(objMeshModel->vertices[0]), &objMeshModel->vertices[0], GL_STATIC_DRAW);
@@ -111,10 +93,8 @@ void ObjLoader::LoadMesh()
     glBindVertexArray(OBJ_VAO_Id);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glEnableVertexAttribArray(VERTEX_POSITION);
-    glEnableVertexAttribArray(TEX_COORD);
     glEnableVertexAttribArray(NORMAL_POSITION);
     glVertexAttribPointer(VERTEX_POSITION, 3, GL_FLOAT, GL_FALSE, stride, 0);
-    glVertexAttribPointer(TEX_COORD, 2, GL_FLOAT, GL_FALSE, stride, offsetTexCoord);
     glVertexAttribPointer(NORMAL_POSITION, 3, GL_FLOAT, GL_FALSE, stride, offset);
     glBindVertexArray(0);
     
@@ -130,7 +110,7 @@ void ObjLoader::LoadMesh()
 ObjLoader::~ObjLoader()
 {
 	PROGRAM* program = NULL;
-	if ( program = ProgramManagerObj->Program( ( char * )"ShaderObj" ) )
+	if ( program = ProgramManagerObj->Program( ( char * )"ReflectionShader" ) )
 	{
 		ProgramManagerObj->RemoveProgram(program);
 	}
@@ -145,123 +125,57 @@ ObjLoader::~ObjLoader()
 */
 void ObjLoader::InitModel()
 {
-	ProgramManager* ProgramManagerObj   = MapRenderHandler->RendererProgramManager();
-	Transform*	TransformObj            = MapRenderHandler->RendererTransform();
+	ProgramManager* ProgramManagerObj   = RendererHandler->RendererProgramManager();
+	Transform*	TransformObj            = RendererHandler->RendererTransform();
 
-
-	if (! ( program = ProgramManagerObj->Program( ( char * )"ShaderObj" ) ) )
-	{
-		program = ProgramManagerObj->ProgramInit( ( char * )"ShaderObj" );
+	if (! ( program = ProgramManagerObj->Program( ( char * )"ReflectionShader" ) ) ){
+		program = ProgramManagerObj->ProgramInit( ( char * )"ReflectionShader" );
 		ProgramManagerObj->AddProgram( program );
 	}
 
 	program->VertexShader	= ShaderManager::ShaderInit( VERTEX_SHADER_PRG,	GL_VERTEX_SHADER	);
 	program->FragmentShader	= ShaderManager::ShaderInit( FRAGMENT_SHADER_PRG, GL_FRAGMENT_SHADER	);
 
-    //////////////////////////////////////////////////////
     /////////// Vertex shader //////////////////////////
-    //////////////////////////////////////////////////////
 	CACHE *m = reserveCache( VERTEX_SHADER_PRG, true );
 
 	if( m ) {
 		if( !ShaderManager::ShaderCompile( program->VertexShader, ( char * )m->buffer, 1 ) ) exit( 1 );
-        freeCache( m );
+        m = freeCache( m );
 	}
 
+    /////////// Fragment shader //////////////////////////
 	m = reserveCache( FRAGMENT_SHADER_PRG, true );
 	if( m ) {
 		if( !ShaderManager::ShaderCompile( program->FragmentShader, ( char * )m->buffer, 1 ) ) exit( 2 );
-        freeCache( m );
+        m = freeCache( m );
 	}
 
     if( !ProgramManagerObj->ProgramLink( program, 1 ) ) exit( 3 );
 
     glUseProgram( program->ProgramID );
-    
-    char MaterialAmbient   = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"MaterialAmbient");
-    char MaterialSpecular  = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"MaterialSpecular");
-    char MaterialDiffuse   = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"MaterialDiffuse");
-    char LightAmbient      = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"LightAmbient");
-    char LightSpecular     = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"LightSpecular");
-    char LightDiffuse      = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"LightDiffuse");
-    char ShininessFactor   = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"ShininessFactor");
-    char LightPosition     = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"LightPosition");
-        timer              = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"Time");
-    toggleIndex           = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"toggleDiscardBehaviour");
-    char Side              = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"Side");
-    char DotSize           = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"DotSize");
-    
-    char ModelColor           = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"ModelColor");
-    char DotColor           = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"DotColor");
-    char BackSideModelColor           = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"BackSideModelColor");
-    char BackSideDotColor           = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"BackSideDotColor");
-    
-    if (MaterialAmbient >= 0){
-        glUniform3f(MaterialAmbient, 0.04f, 0.04f, 0.04f);
+    char uniformTex = ProgramManagerObj->ProgramGetUniformLocation( program, (char *) "CubeMap" );
+    if (uniformTex >= 0) {
+        glUniform1i(uniformTex, 1);
     }
-    
-    if (MaterialSpecular >= 0){
-        glUniform3f(MaterialSpecular, 1.0, 0.5, 0.5);
-    }
-    
-    glm::vec3 color = glm::vec3(1.0, 1.0, 1.0);// * 0.75f;
-    if (MaterialDiffuse >= 0){
-        glUniform3f(MaterialDiffuse, color.r, color.g, color.b);
+    char Camera = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"CameraPosition");
+    if (Camera >= 0){
+        glm::vec3 cp = RendererHandler->getCameraPosition();
+        glUniform3fv(Camera, 1, (float*)&cp);
     }
 
-    if ( LightAmbient >= 0 ){
-        glUniform3f( LightAmbient, 1.0f, 1.0f, 1.0f );
-    }
-    
-    if ( LightSpecular >=  0 ){
-        glUniform3f( LightSpecular, 1.0, 1.0, 1.0 );
-    }
-
-    if ( LightDiffuse >= 0 ){
-        glUniform3f(LightDiffuse, 1.0f, 1.0f, 1.0f);
-    }
-
-    if ( ShininessFactor >= 0 ){
-        glUniform1f(ShininessFactor, 40);
-    }
-    
-    if (LightPosition >= 0){
-        glUniform3f(LightPosition, 0.0, 0.0, 10.0 );
-    }
-
-    if ( toggleIndex >= 0 ){
-        glUniform1i(toggleIndex, (int)toggle);
-    }
-    
-    if ( Side >= 0 ){
-        glUniform1f(Side, 0.30);
-    }
-    
-    if ( DotSize >= 0 ){
-        glUniform1f(DotSize, 0.13);
-    }
-    
-    if (ModelColor >= 0){
-        glUniform3f(ModelColor, 1.0, 1.0, 1.0 );
-    }
-    
-    if (DotColor >= 0){
-        glUniform3f(DotColor, 0.4, 0.5, 1.0 );
-    }
-    
-    if (BackSideModelColor >= 0){
-        glUniform3f(BackSideModelColor, 0.0, 1.0, 0.0 );
-    }
-    
-    if (BackSideDotColor >= 0){
-        glUniform3f(BackSideDotColor, 1.0, 0.0, 0.0 );
+    char indexOfRefract = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"RefractIndex");
+    if (indexOfRefract >= 0){
+        //float iOfR = 3.5f;
+        float iOfR = 0.5f;
+        glUniform1f(indexOfRefract, iOfR);
     }
     
 
-    MVP = ProgramManagerObj->ProgramGetUniformLocation( program, ( char* )"ModelViewProjectionMatrix" );
-    MV  = ProgramManagerObj->ProgramGetUniformLocation( program, ( char* )"ModelViewMatrix" );
+    MVP = ProgramManagerObj->ProgramGetUniformLocation( program, ( char* )"MODELVIEWPROJECTIONMATRIX" );
+    M   = ProgramManagerObj->ProgramGetUniformLocation( program, ( char* )"MODELMATRIX" );
     NormalMatrix  = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"NormalMatrix");
-    
+
     return;
 }
 
@@ -274,31 +188,28 @@ void ObjLoader::InitModel()
 */
 void ObjLoader::Render()
 {
-    glDisable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+    
     // Use Specular program
     glUseProgram(program->ProgramID);
-    
+    glActiveTexture(GL_TEXTURE1);
+
     // Apply Transformation.
 	TransformObj->TransformPushMatrix();
     static float rot = 0.0;
 	TransformObj->TransformRotate(rot++ , 1.0, 1.0, 1.0);
     glUniformMatrix4fv( MVP, 1, GL_FALSE,( float * )TransformObj->TransformGetModelViewProjectionMatrix() );
-    glUniformMatrix4fv( MV, 1, GL_FALSE,( float * )TransformObj->TransformGetModelViewMatrix() );
+    glUniformMatrix4fv( M, 1, GL_FALSE,( float * )TransformObj->TransformGetModelMatrix() );
+
     glm::mat4 matrix    = *(TransformObj->TransformGetModelViewMatrix());
     glm::mat3 normalMat = glm::mat3( glm::vec3(matrix[0]), glm::vec3(matrix[1]), glm::vec3(matrix[2]) );
     glUniformMatrix3fv( NormalMatrix, 1, GL_FALSE, (float*)&normalMat );
     TransformObj->TransformPopMatrix();
-    timeUpdate = clock();
-    glUniform1f(timer, timeUpdate/CLOCKS_PER_SEC*3);
+    
     // Bind with Vertex Array Object for OBJ
     glBindVertexArray(OBJ_VAO_Id);
     
-    if ( clock() - lastUpdate  > 5*CLOCKS_PER_SEC)
-    {
-        lastUpdate = timeUpdate;
-            toggle= !toggle;
-    glUniform1i(toggleIndex, (int)toggle);
-    }
     // Draw Geometry
     glDrawArrays(GL_TRIANGLES, 0, IndexCount );
     

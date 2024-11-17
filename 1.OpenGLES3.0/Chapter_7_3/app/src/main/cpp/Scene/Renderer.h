@@ -28,6 +28,9 @@ typedef struct
 
 	//! Render Scene as Orthographics Or Perspective.
 	bool isPerspective;
+
+	//! Render Scene as Orthographics Or Perspective.
+    glm::vec3 cameraPosition;
 } RendererData;
 
 class Renderer
@@ -78,6 +81,10 @@ public:
 
 	//! Cache the model
 	void addModel( Model* );
+    
+    glm::vec3 getCameraPosition(){ return RenderMemData.cameraPosition;}
+
+    void setCameraPosition( glm::vec3 cp ){ RenderMemData.cameraPosition = -cp;}
 
 	void TouchEventDown( float a, float b );
 
@@ -85,18 +92,18 @@ public:
 
 	void TouchEventMove( float a, float b );
 
-    void TouchEventRelease( float a, float b );
-    void SetModelPath(std::string path);
+	void TouchEventRelease( float a, float b );
 
-    //! resize screen
-    void resize( int w, int h );
-    static Renderer& Instance()
+	//! resize screen
+	void resize( int w, int h );
+    
+	static Renderer& Instance()
     {
         static Renderer rendererObj;
         return rendererObj;
     }
 
-    inline bool isPerspectiveView(){ return RenderMemData.isPerspective; }
+	inline bool isPerspectiveView(){ return RenderMemData.isPerspective; }
 
 private:
     //! Map render member variable container

@@ -33,14 +33,15 @@ LOCAL_SRC_FILES := \
     $(FRAMEWORK_DIR)/ShaderManager.cpp \
     $(FRAMEWORK_DIR)/ProgramManager.cpp \
     $(FRAMEWORK_DIR)/Transform.cpp \
+    $(WAVEFRONTOBJ_LIB_PATH)/WaveFrontOBJ.cpp \
     $(TEXTURE_LIB_PATH)/Image.cpp \
     $(TEXTURE_LIB_PATH)/CompressedImage.cpp \
     $(TEXTURE_LIB_PATH)/PngImage.cpp \
+    $(SCENE_DIR)/ObjLoader.cpp \
     $(SCENE_DIR)/Model.cpp \
     $(SCENE_DIR)/Renderer.cpp \
     $(SCENE_DIR)/Skybox.cpp \
     NativeTemplate.cpp
-
 
 LOCAL_SHARED_LIBRARIES := zlib GLPipng
 LOCAL_LDLIBS    := -llog -lEGL -lGLESv3
