@@ -21,12 +21,12 @@ private:
     void InitModel();
     ObjLoader* objModel;
     SimpleTexture* textureQuad;
-    GLuint fboId, rboId, textureId, depthTextureId;
+    GLuint fboId, rboId, textureId, depthTextureId, stencilTextureId;
     
 public:
     DemoFBO( Renderer* parent = 0);
     ~DemoFBO();
-    unsigned int generateTexture(int width,int height,bool isDepth=false);
+    unsigned int generateTexture(int width,int height,bool isDepth=false, bool isStencil=false);
     void GenerateFBO();
     void GenerateFBOWithRenderBuffer();
     void Render();

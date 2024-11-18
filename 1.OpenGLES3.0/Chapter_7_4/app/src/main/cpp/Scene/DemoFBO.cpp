@@ -12,7 +12,7 @@
 #define TEXTURE_HEIGHT 512
 int m_vViewport[4];
 
-unsigned int DemoFBO::generateTexture(int width,int height,bool isDepth)
+unsigned int DemoFBO::generateTexture(int width,int height,bool isDepth, bool isStencil)
 {
 	unsigned int texId;
     glGenTextures(1, &texId);
@@ -23,7 +23,9 @@ unsigned int DemoFBO::generateTexture(int width,int height,bool isDepth)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	if (isDepth){
         glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, width, height, 0,GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-        
+    }
+    else if (isStencil) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
     }
     else{
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
@@ -49,7 +51,8 @@ void DemoFBO::GenerateFBO()
     //Create color and depth buffer texture object
     textureId = generateTexture(TEXTURE_WIDTH,TEXTURE_HEIGHT);
     depthTextureId = generateTexture(TEXTURE_WIDTH,TEXTURE_HEIGHT, true);
-   
+    stencilTextureId = generateTexture(TEXTURE_WIDTH,TEXTURE_HEIGHT, true, true);
+
     // attach the texture to FBO color attachment point
     glFramebufferTexture2D(GL_FRAMEBUFFER,        // 1. fbo target: GL_FRAMEBUFFER
                            GL_COLOR_ATTACHMENT0,  // 2. Color attachment point
@@ -63,8 +66,20 @@ void DemoFBO::GenerateFBO()
                            GL_TEXTURE_2D,         // 3. tex target: GL_TEXTURE_2D
                            depthTextureId,        // 4. depth texture ID
                            0);                    // 5. mipmap level: 0(base)
-    
-     // check FBO status
+
+
+    // attach the texture to FBO color attachment point
+/*
+    // heckFramebufferCompleteness: stencil attachment not complete: 0x8cd6 ERROR 발생.
+    glFramebufferTexture2D(GL_FRAMEBUFFER,        // 1. fbo target: GL_FRAMEBUFFER
+                           GL_DEPTH_STENCIL_ATTACHMENT,   // 2. Depth attachment point
+                           GL_TEXTURE_2D,         // 3. tex target: GL_TEXTURE_2D
+                           stencilTextureId,        // 4. stencil texture ID
+                           0);                    // 5. mipmap level: 0(base)
+*/
+
+
+    // check FBO status
      GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
      if(status != GL_FRAMEBUFFER_COMPLETE){
          printf("Framebuffer creation fails: %d", status);
