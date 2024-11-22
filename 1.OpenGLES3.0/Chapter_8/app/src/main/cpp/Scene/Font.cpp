@@ -104,7 +104,7 @@ void Font::InitModel() {
     
     // Get the uniform location cache for optimization purpose
     MVP         = ProgramManagerObj->ProgramGetUniformLocation( program, (char*)"ModelViewProjectMatrix" );
-    TEX         = ProgramManagerObj->ProgramGetUniformLocation( program, (char *) "Tex1" );
+    //TEX         = ProgramManagerObj->ProgramGetUniformLocation( program, (char *) "Tex1" );
     FRAG_COLOR  = ProgramManagerObj->ProgramGetUniformLocation( program, (char*)"TextColor" );
 }
 

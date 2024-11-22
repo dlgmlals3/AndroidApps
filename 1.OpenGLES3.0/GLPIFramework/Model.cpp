@@ -23,7 +23,6 @@ Model::~Model()
  */
 void Model::InitModel()
 {
-    LOGI("InitModel dlgmlals3 !!!!");
     for(int i =0; i <childList.size(); i++){
         childList.at(i)->InitModel();
     }
