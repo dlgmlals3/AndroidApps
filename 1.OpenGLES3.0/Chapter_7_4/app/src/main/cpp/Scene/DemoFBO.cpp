@@ -8,12 +8,16 @@
 
 #include "DemoFBO.h"
 
-#define TEXTURE_WIDTH 512
-#define TEXTURE_HEIGHT 512
+#define TEXTURE_WIDTH 1080
+#define TEXTURE_HEIGHT 2201
+//#define TEXTURE_WIDTH 512
+//#define TEXTURE_HEIGHT 512
 int m_vViewport[4];
 
 unsigned int DemoFBO::generateTexture(int width,int height,bool isDepth, bool isStencil)
 {
+    LOGI("GenerateTExture : %d %d\n", width, height);
+
 	unsigned int texId;
     glGenTextures(1, &texId);
     glBindTexture(GL_TEXTURE_2D, texId);
@@ -49,8 +53,8 @@ void DemoFBO::GenerateFBO()
     glBindFramebuffer(GL_FRAMEBUFFER, fboId);
 
     //Create color and depth buffer texture object
-    textureId = generateTexture(TEXTURE_WIDTH,TEXTURE_HEIGHT);
-    depthTextureId = generateTexture(TEXTURE_WIDTH,TEXTURE_HEIGHT, true);
+    textureId = generateTexture(TEXTURE_WIDTH, TEXTURE_HEIGHT);
+    depthTextureId = generateTexture(TEXTURE_WIDTH, TEXTURE_HEIGHT, true);
     stencilTextureId = generateTexture(TEXTURE_WIDTH,TEXTURE_HEIGHT, true, true);
 
     // attach the texture to FBO color attachment point
@@ -107,7 +111,7 @@ void DemoFBO::GenerateFBOWithRenderBuffer()
     // create a renderbuffer object to store depth info
     glGenRenderbuffers(1, &rboId);
     glBindRenderbuffer(GL_RENDERBUFFER, rboId);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, TEXTURE_WIDTH,TEXTURE_HEIGHT);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, TEXTURE_WIDTH, TEXTURE_HEIGHT);
 
     // attach the renderbuffer to depth attachment point
     glFramebufferRenderbuffer(GL_FRAMEBUFFER,      // 1. fbo target: GL_FRAMEBUFFER
@@ -152,6 +156,8 @@ DemoFBO::~DemoFBO()
 
 void DemoFBO::InitModel()
 {
+    LOGI("dlgmlals3 InitModel");
+
     //Initialize the Polka dots 
     objModel->InitModel();
 
@@ -168,31 +174,40 @@ void DemoFBO::Render()
     int CurrentFbo;
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &CurrentFbo);
 	glBindFramebuffer(GL_FRAMEBUFFER,fboId);
+
+    // glViewport(0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT);
     glViewport(0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     objModel->Render();
     glBindFramebuffer(GL_FRAMEBUFFER, CurrentFbo);
     TransformObj->TransformError();
-    
+
+
+    // dlgmlals3
+
     // Render Quad with render buffer mapped.
-    glViewport(0, 0, RendererHandler->screenWidthPixel(), RendererHandler->screenHeightPixel());
-	glClearColor(0.710,0.610,0.30,1.0);
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    glViewport(0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+
+	//LOGI("viewport : %d %d", RendererHandler->screenWidthPixel(), RendererHandler->screenHeightPixel());
+    glClearColor(0.,0.,0.,0.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glActiveTexture (GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textureId);
     textureQuad->Render();
     TransformObj->TransformError();
+
 }
 
 void DemoFBO::TouchEventDown( float x, float y )
 {
-    objModel->TouchEventDown( x, y );
-    textureQuad->TouchEventDown( x, y );
+    //objModel->TouchEventDown( x, y );
+    //textureQuad->TouchEventDown( x, y );
 }
 
 void DemoFBO::TouchEventMove( float x, float y )
 {
-    textureQuad->TouchEventMove( x, y );
+    //textureQuad->TouchEventMove( x, y );
 }
 
 void DemoFBO::TouchEventRelease( float x, float y )

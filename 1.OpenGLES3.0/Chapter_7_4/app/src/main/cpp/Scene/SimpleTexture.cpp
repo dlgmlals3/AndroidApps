@@ -44,10 +44,10 @@ float texCoords[8] ={   0.0f, 0.0f,
                     };
 
 float quad[12]     ={
-                        -1.0f, -1.0f,  0.0f,
-                         1.0f, -1.0f,  0.0f,
-                        -1.0f, 1.0f, -0.0f,
-                         1.0f, 1.0f, -0.0f
+                        -1.0f, -1.0f, 0.0f,
+                         1.0f, -1.0f, 0.0f,
+                        -1.0f, 1.0f, 0.0f,
+                         1.0f, 1.0f, 0.0f
                     };
 
 // Namespace used
@@ -136,7 +136,13 @@ void SimpleTexture::InitModel()
     
     MVP = ProgramManagerObj->ProgramGetUniformLocation( program, ( char* )"MODELVIEWPROJECTIONMATRIX" );
     TEX = ProgramManagerObj->ProgramGetUniformLocation( program, (char *) "Tex1" );
-    
+
+    float aspectRatio = 2201 / 1080;
+    quad[1] *= aspectRatio;
+    quad[4] *= aspectRatio;
+    quad[7] *= aspectRatio;
+    quad[10] *= aspectRatio;
+
     return;
 }
 
@@ -154,14 +160,23 @@ void SimpleTexture::Render()
 	glUseProgram(program->ProgramID);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-    
-	TransformObj->TransformPushMatrix();
 
+    GLboolean isCullFaceEnabled;
+    glGetBooleanv(GL_CULL_FACE, &isCullFaceEnabled);
+    if (isCullFaceEnabled) {
+        printf("Cull face is still enabled!\n");
+    } else {
+        printf("Cull face is disabled as expected.\n");
+    }
+
+	TransformObj->TransformPushMatrix();
 	TransformObj->TransformRotate(rotationX, 0.0, 1.0, 0.0);
 	TransformObj->TransformRotate(rotationY, 1.0, 0.0, 0.0);
+
+    // dlgmlals3
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glUniform1i(TEX, 0);
@@ -170,6 +185,7 @@ void SimpleTexture::Render()
     glEnableVertexAttribArray(TEX_COORD);
 	glVertexAttribPointer(TEX_COORD, 2, GL_FLOAT, GL_FALSE, 0, texCoords);
 	glVertexAttribPointer(VERTEX_POSITION, 3, GL_FLOAT, GL_FALSE, 0, quad);
+
     glUniformMatrix4fv( MVP, 1, GL_FALSE,( float * )TransformObj->TransformGetModelViewProjectionMatrix() );
 	TransformObj->TransformPopMatrix();
     
@@ -177,45 +193,26 @@ void SimpleTexture::Render()
     
 	glDisableVertexAttribArray(VERTEX_POSITION);
 	glDisableVertexAttribArray(TEX_COORD);
-    if ( deltaX != 0.0 ){
-        if( deltaX > 0.0 ){
-            deltaX -= DecelerationFactor;
-        }
-        else{
-            deltaX += DecelerationFactor;
-        }
-        rotationX += deltaX;
-    }
-
-    if ( deltaY != 0.0 ){
-        if( deltaY > 0.0 ){
-            deltaY -= DecelerationFactor;
-        }
-        else{
-            deltaY += DecelerationFactor;
-        }
-        rotationY += deltaY;
-    }
 }
 
 void SimpleTexture::TouchEventDown( float x, float y )
 {
-    lastX = x;
-    lastY = y;
+/*    lastX = x;
+    lastY = y;*/
 }
 
 void SimpleTexture::TouchEventMove( float x, float y )
 {
-    rotationX += (x - lastX) * PACE;
+ /*   rotationX += (x - lastX) * PACE;
     rotationY += (y - lastY) * PACE;
     lastX = x;
-    lastY = y;
+    lastY = y;*/
 }
 
 void SimpleTexture::TouchEventRelease( float x, float y )
 {
-    deltaX = x - lastX;
-    deltaY = y - lastY;
+/*    deltaX = x - lastX;
+    deltaY = y - lastY;*/
 }
 
 

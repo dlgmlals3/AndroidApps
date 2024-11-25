@@ -6,6 +6,7 @@ bool Model::useProgram(char* programName)
 {
 	return false;
 }
+
 Model::Model(Renderer*	handler, Model* model, ModelType type)
 {
     parent      = NULL;

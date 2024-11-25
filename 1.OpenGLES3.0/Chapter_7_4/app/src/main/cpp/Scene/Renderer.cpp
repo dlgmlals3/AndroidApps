@@ -21,8 +21,6 @@ void Renderer::initializeRenderer()
 void Renderer::createModels()
 {
 	clearModels();
-	//addModel( new ObjLoader	( this ) );
-	//addModel( new SimpleTexture	( this ) );
 	addModel( new DemoFBO	( this ) );
 }
 
@@ -103,9 +101,11 @@ void Renderer::setUpProjection()
 */
 void Renderer::resize(int w, int h)
 {
+    LOGI("Resize : %d %d\n", w, h);
 	RenderMemData.screenWidth		= w;
 	RenderMemData.screenHeight		= h;
 	glViewport( 0, 0, w, h );
+
 }
 
 /*!
@@ -230,9 +230,9 @@ void Renderer::initializeModels()
 */
 void Renderer::render()
 {
-	glClearColor(0.60f, 0.40f, 0.20f, 1.0f);
+    glClearColor(1.f, 0.f, 0.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-
+    // dlgmlals3
 	for( int i=0; i<RenderMemData.models.size();  i++ ){
 		RenderMemData.models.at(i)->Render();
 	}

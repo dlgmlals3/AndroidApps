@@ -262,17 +262,18 @@ void ObjLoader::TouchEventDown( float x, float y )
     RenderPrimitive++;
     if (RenderPrimitive > 2)
         RenderPrimitive = 0;
+
+    SwitchMesh();
 }
 
 void ObjLoader::TouchEventDoubleClick( float x, float y )
 {
-    LOGI("TouchEventDoubleClick");
-    RenderPrimitive = 0;
-    SwitchMesh();
+
 }
 
 void ObjLoader::TouchEventMove( float x, float y )
 {
+
 }
 
 void ObjLoader::TouchEventRelease( float x, float y )

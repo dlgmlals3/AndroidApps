@@ -240,8 +240,14 @@ void ObjLoader::Render()
     glUniformMatrix4fv( MVP, 1, GL_FALSE,( float * )TransformObj->TransformGetModelViewProjectionMatrix() );
     glUniformMatrix4fv( MV, 1, GL_FALSE,( float * )TransformObj->TransformGetModelViewMatrix() );
     glm::mat4 matrix    = *(TransformObj->TransformGetModelViewMatrix());
-    glm::mat3 normalMat = glm::transpose(glm::inverse(glm::mat3(matrix)));
-    glUniformMatrix3fv( NormalMatrix, 1, GL_FALSE, (float*)&normalMat );
+
+    //glm::mat3 normalMat = glm::transpose(glm::inverse(glm::mat3(matrix)));
+    //glUniformMatrix3fv( NormalMatrix, 1, GL_FALSE, (float*)&normalMat );
+
+    glm::mat3 normalTransform  = glm::mat3( glm::vec3(matrix[0]), glm::vec3(matrix[1]), glm::vec3(matrix[2]) );
+    normalTransform = glm::transpose(glm::inverse(normalTransform));
+    glUniformMatrix3fv( NormalMatrix, 1, GL_FALSE, (float*)&normalTransform );
+
     TransformObj->TransformPopMatrix();
     
     // Bind with Vertex Array Object for OBJ

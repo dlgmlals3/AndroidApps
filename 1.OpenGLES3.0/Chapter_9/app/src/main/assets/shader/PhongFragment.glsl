@@ -66,6 +66,8 @@ void main() {
 
     float insideCircle, length;
     vec3 position = mod(ObjectCoord, Cube) - Cube/2.0;
+    position = ObjectCoord;
+
     length        = sqrt( position.x * position.x + position.y * position.y +position.z * position.z );
     //length        = length( position );
     insideCircle  = step(length,DotSize);
