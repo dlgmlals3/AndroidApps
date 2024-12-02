@@ -10,8 +10,12 @@ uniform mat3    NormalMatrix;
 
 out vec3    normalCoord;
 out vec3    eyeCoord;
+out vec3    ObjectCoord;
 
 void main() 
 {
-    gl_Position = VertexPosition;
+    normalCoord = NormalMatrix * Normal;
+    eyeCoord    = vec3 ( ModelViewMatrix * VertexPosition );
+    ObjectCoord = VertexPosition.xyz;
+    gl_Position = ModelViewProjectionMatrix * VertexPosition;
 }

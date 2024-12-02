@@ -46,5 +46,6 @@ vec3 PhongShading()
 
 void main() {
     FinalColor = vec4(PhongShading(), 1.0);
+    FinalColor = vec4(1,0,0,1);
 }
 
