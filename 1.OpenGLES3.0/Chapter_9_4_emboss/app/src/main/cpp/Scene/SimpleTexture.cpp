@@ -1,3 +1,11 @@
+//
+//  SimpleTexture.cpp
+//  Reflection
+//
+//  Created by macbook on 1/16/14.
+//  Copyright (c) 2014 macbook. All rights reserved.
+//
+
 #include "SimpleTexture.h"
 
 #include <cstdio>
@@ -11,10 +19,10 @@
 //Note: The Linux is very case sensitive so be aware of specifying correct folder and filename.
 #ifdef __IPHONE_4_0
 #define VERTEX_SHADER_PRG			( char * )"Vertex.glsl"
-#define FRAGMENT_SHADER_PRG			( char * )"ToonFragment.glsl"
+#define FRAGMENT_SHADER_PRG			( char * )"EmbossFrag.glsl"
 #else
 #define VERTEX_SHADER_PRG			( char * )"shader/Vertex.glsl"
-#define FRAGMENT_SHADER_PRG			( char * )"shader/ToonFragment.glsl"
+#define FRAGMENT_SHADER_PRG			( char * )"shader/EmbossFrag.glsl"
 #endif
 
 #define VERTEX_POSITION 0
@@ -58,7 +66,7 @@ SimpleTexture::SimpleTexture( Renderer* parent )
 	if (!parent)
 		return;
     
-	RendererHandler	= parent;
+	RendererHandler     = parent;
 	ProgramManagerObj	= parent->RendererProgramManager();
 	TransformObj		= parent->RendererTransform();
 	modelType 			= CubeType;
@@ -91,6 +99,7 @@ SimpleTexture::~SimpleTexture()
  */
 void SimpleTexture::InitModel()
 {
+    
     // Edge Detection Shader
     if (! ( program = ProgramManagerObj->Program( ( char * )"EdgeDetection" ) ) )
     {
@@ -118,18 +127,13 @@ void SimpleTexture::InitModel()
     if( !ProgramManagerObj->ProgramLink( program, 1 ) ) exit( 3 );
     glUseProgram( program->ProgramID );
 
-    MVP = ProgramManagerObj->ProgramGetUniformLocation( program,(char*)"MODELVIEWPROJECTIONMATRIX" );
-    TEX = ProgramManagerObj->ProgramGetUniformLocation( program, (char *) "Tex1" );
-    SCREEN_COORD_X = ProgramManagerObj->ProgramGetUniformLocation( program, (char *) "ScreenCoordX" );
-    GRAD_THRESHOLD = ProgramManagerObj->ProgramGetUniformLocation( program, (char *) "GradientThreshold" );
-    QUANTIZATION = ProgramManagerObj->ProgramGetUniformLocation( program, (char *) "quantizationFactor" );
-    
-    if(GRAD_THRESHOLD >= 0){
-        glUniform1f(GRAD_THRESHOLD, 0.05);
-    }
+    MVP = ProgramManagerObj->ProgramGetUniformLocation( program,(char*)"MODELVIEWPROJECTIONMATRIX");
+    TEX = ProgramManagerObj->ProgramGetUniformLocation( program, (char *) "Tex1");
+    SCREEN_COORD_X = ProgramManagerObj->ProgramGetUniformLocation( program, (char *) "ScreenCoordX");
+    BRIGHTNESS = ProgramManagerObj->ProgramGetUniformLocation( program, (char *) "EmbossBrightness");
 
-    if(QUANTIZATION >= 0){
-        glUniform1f(QUANTIZATION, 5.);
+    if (BRIGHTNESS >= 0){
+        glUniform1f(BRIGHTNESS, 0.7);
     }
     return;
 }

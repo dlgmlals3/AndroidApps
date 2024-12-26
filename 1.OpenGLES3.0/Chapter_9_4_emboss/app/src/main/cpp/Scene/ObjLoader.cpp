@@ -30,7 +30,7 @@ GLvoid* offsetTexCoord;
 char MVP;
 char MV;
 GLint NormalMatrix;
-int ModelNumber = 2;
+int ModelNumber = 1;
 GLuint vertexBuffer;
 
 // Namespace used
@@ -86,7 +86,7 @@ void ObjLoader::LoadMesh()
 #ifdef __IPHONE_4_0
     GLUtils::extractPath( getenv( "FILESYSTEM" ), fname );
 #else
-    strcpy( fname, "/storage/emulated/0/Android/data/cookbook.opengles_9_3/files/" );
+    strcpy( fname, "/storage/emulated/0/Android/data/cookbook.opengles_9_4/files/" );
 #endif
 
     strcat( fname, ModelNames[ModelNumber]);
@@ -243,7 +243,6 @@ void ObjLoader::Render()
 	TransformObj->TransformPushMatrix();
     static float rot = 0.0;
 	//TransformObj->TransformRotate(rot++ , 1.0, 1.0, 1.0);
-    TransformObj->TransformRotate(rot , 1.0, 1.0, 1.0);
     glUniformMatrix4fv( MVP, 1, GL_FALSE,( float * )TransformObj->TransformGetModelViewProjectionMatrix() );
     glUniformMatrix4fv( MV, 1, GL_FALSE,( float * )TransformObj->TransformGetModelViewMatrix() );
     glm::mat4 matrix    = *(TransformObj->TransformGetModelViewMatrix());
