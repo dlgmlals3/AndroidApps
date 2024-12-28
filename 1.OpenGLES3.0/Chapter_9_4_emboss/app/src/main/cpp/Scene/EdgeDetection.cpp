@@ -9,7 +9,6 @@
 #include "EdgeDetection.h"
 #define PI 3.1415926535
 
-
 int TEXTURE_WIDTH = 1080;
 int TEXTURE_HEIGHT = 2400;
 int m_vViewport[4];
@@ -118,9 +117,9 @@ void EdgeDetection::InitModel()
 void EdgeDetection::EdgeDetect()
 {
     glDisable(GL_DEPTH_TEST);
-
     glBindFramebuffer(GL_FRAMEBUFFER, DefaultFBO);
     glViewport(0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+
     glActiveTexture (GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D,textureId);
     
@@ -138,8 +137,12 @@ void EdgeDetection::RenderObj()
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &DefaultFBO);
     
     // Bind Framebuffer object
-    glBindFramebuffer(GL_FRAMEBUFFER,FboId);
+     glBindFramebuffer(GL_FRAMEBUFFER, FboId);
+
     glViewport(0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureId,0);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTextureId, 0);
     

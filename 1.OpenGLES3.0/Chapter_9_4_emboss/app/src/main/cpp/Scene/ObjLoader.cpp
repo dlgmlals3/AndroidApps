@@ -30,7 +30,7 @@ GLvoid* offsetTexCoord;
 char MVP;
 char MV;
 GLint NormalMatrix;
-int ModelNumber = 1;
+int ModelNumber = 3;
 GLuint vertexBuffer;
 
 // Namespace used
@@ -243,6 +243,7 @@ void ObjLoader::Render()
 	TransformObj->TransformPushMatrix();
     static float rot = 0.0;
 	//TransformObj->TransformRotate(rot++ , 1.0, 1.0, 1.0);
+
     glUniformMatrix4fv( MVP, 1, GL_FALSE,( float * )TransformObj->TransformGetModelViewProjectionMatrix() );
     glUniformMatrix4fv( MV, 1, GL_FALSE,( float * )TransformObj->TransformGetModelViewMatrix() );
     glm::mat4 matrix    = *(TransformObj->TransformGetModelViewMatrix());
@@ -261,7 +262,8 @@ void ObjLoader::Render()
 
 void ObjLoader::TouchEventDown( float x, float y )
 {
-    SwitchMesh();
+    // dlgmlals3
+    //SwitchMesh();
 }
 
 void ObjLoader::TouchEventMove( float x, float y )

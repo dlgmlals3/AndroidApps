@@ -45,24 +45,24 @@ vec3 PhongShading()
 }
 
 in vec3  ObjectCoord;
-float Side      = 0.30;
-float DotSize   = 0.13;
-vec3 Cube       = vec3(Side, Side, Side);
-vec3 RenderColor= vec3(0.0, 0.0, 0.0);
-
-// Front face Model(mesh) color
-vec3 ModelColor = vec3(1.0, 1.0, 1.0);
-// Front face Model(mesh) color
-vec3 DotColor   = vec3(0.4, 0.5, 1.0);
-
-// Back face Model(mesh) color
-vec3 BackSideModelColor = vec3(0.0, 1.0, 0.0);
-// Back face polka dot color
-vec3 BackSideDotColor   = vec3(1.0, 1.0, 1.0);
 
 
 void main() {
-    
+    float Side      = 0.30;
+    float DotSize   = 0.13;
+    vec3 Cube       = vec3(Side, Side, Side);
+    vec3 RenderColor= vec3(0.0, 0.0, 0.0);
+
+    // Front face Model(mesh) color
+    vec3 ModelColor = vec3(1.0, 1.0, 1.0);
+    // Front face Model(mesh) color
+    vec3 DotColor   = vec3(0.4, 0.5, 1.0);
+
+    // Back face Model(mesh) color
+    vec3 BackSideModelColor = vec3(0.0, 1.0, 0.0);
+    // Back face polka dot color
+    vec3 BackSideDotColor   = vec3(1.0, 1.0, 1.0);
+
     float insideCircle, length;
     vec3 position = mod(ObjectCoord, Cube) - Cube/2.0;
     length        = sqrt( position.x * position.x + position.y * position.y +position.z * position.z );

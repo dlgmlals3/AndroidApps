@@ -99,7 +99,7 @@ SimpleTexture::~SimpleTexture()
  */
 void SimpleTexture::InitModel()
 {
-    
+    LOGI("InitModel\n");
     // Edge Detection Shader
     if (! ( program = ProgramManagerObj->Program( ( char * )"EdgeDetection" ) ) )
     {
@@ -127,9 +127,9 @@ void SimpleTexture::InitModel()
     if( !ProgramManagerObj->ProgramLink( program, 1 ) ) exit( 3 );
     glUseProgram( program->ProgramID );
 
-    MVP = ProgramManagerObj->ProgramGetUniformLocation( program,(char*)"MODELVIEWPROJECTIONMATRIX");
+    MVP = ProgramManagerObj->ProgramGetUniformLocation( program,(char*) "MODELVIEWPROJECTIONMATRIX");
     TEX = ProgramManagerObj->ProgramGetUniformLocation( program, (char *) "Tex1");
-    SCREEN_COORD_X = ProgramManagerObj->ProgramGetUniformLocation( program, (char *) "ScreenCoordX");
+    SCREEN_COORD_X = ProgramManagerObj->ProgramGetUniformLocation( program, (char *) "ScreenCoordinateX");
     BRIGHTNESS = ProgramManagerObj->ProgramGetUniformLocation( program, (char *) "EmbossBrightness");
 
     if (BRIGHTNESS >= 0){
@@ -158,9 +158,10 @@ void SimpleTexture::Render()
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     
 }
-
+// dlgmlals3
 void SimpleTexture::TouchEventDown( float x, float y )
 {
+    LOGI("dlgmlals3 TouchEvent %d, %f %f\n", SCREEN_COORD_X, x, y);
     glUseProgram(program->ProgramID);
     glUniform1f(SCREEN_COORD_X, x);
     lastX = x;
