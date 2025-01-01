@@ -129,7 +129,7 @@ void SimpleTexture::InitModel()
 
     MVP = ProgramManagerObj->ProgramGetUniformLocation( program,(char*) "MODELVIEWPROJECTIONMATRIX");
     TEX = ProgramManagerObj->ProgramGetUniformLocation( program, (char *) "Tex1");
-    SCREEN_COORD_X = ProgramManagerObj->ProgramGetUniformLocation( program, (char *) "ScreenCoordinateX");
+    SCREEN_CORDINATE_X = ProgramManagerObj->ProgramGetUniformLocation( program, (char *) "ScreenCoordinateX");
     BRIGHTNESS = ProgramManagerObj->ProgramGetUniformLocation( program, (char *) "EmbossBrightness");
 
     if (BRIGHTNESS >= 0){
@@ -161,9 +161,14 @@ void SimpleTexture::Render()
 // dlgmlals3
 void SimpleTexture::TouchEventDown( float x, float y )
 {
-    LOGI("dlgmlals3 TouchEvent %d, %f %f\n", SCREEN_COORD_X, x, y);
+    LOGI("dlgmlals3 TouchEvent %s index : %d, %f %f\n", program->name, SCREEN_CORDINATE_X, x, y);
     glUseProgram(program->ProgramID);
-    glUniform1f(SCREEN_COORD_X, x);
+    glUniform1f(SCREEN_CORDINATE_X, x);
+
+    GLenum error = glGetError();
+    if (error != GL_NO_ERROR) {
+        printf("glUniform1f error: %d\n", error);
+    }
     lastX = x;
     lastY = y;
 }
@@ -173,7 +178,7 @@ void SimpleTexture::TouchEventMove( float x, float y )
 //    rotationX += (x - lastX) * PACE;
 //    rotationY += (y - lastY) * PACE;
     glUseProgram(program->ProgramID);
-    glUniform1f(SCREEN_COORD_X, x);
+    glUniform1f(SCREEN_CORDINATE_X, x);
     lastX = x;
     lastY = y;
 }

@@ -41,8 +41,8 @@ unsigned int EdgeDetection::generateTexture(int width,int height,bool isDepth)
 
 void EdgeDetection::GenerateFBO()
 {
-    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &TEXTURE_WIDTH);
-    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &TEXTURE_HEIGHT);
+    //glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &TEXTURE_WIDTH);
+    //glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &TEXTURE_HEIGHT);
     LOGI("dlgmlals3 EdgeDetection FBO %d %d\n", TEXTURE_WIDTH, TEXTURE_HEIGHT);
 
     // create a framebuffer object

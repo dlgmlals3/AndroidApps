@@ -30,7 +30,7 @@ GLvoid* offsetTexCoord;
 char MVP;
 char MV;
 GLint NormalMatrix;
-int ModelNumber = 3;
+int ModelNumber = 2;
 GLuint vertexBuffer;
 
 // Namespace used
@@ -242,7 +242,7 @@ void ObjLoader::Render()
     // Apply Transformation.
 	TransformObj->TransformPushMatrix();
     static float rot = 0.0;
-	//TransformObj->TransformRotate(rot++ , 1.0, 1.0, 1.0);
+	TransformObj->TransformRotate(rot++ , 1.0, 1.0, 1.0);
 
     glUniformMatrix4fv( MVP, 1, GL_FALSE,( float * )TransformObj->TransformGetModelViewProjectionMatrix() );
     glUniformMatrix4fv( MV, 1, GL_FALSE,( float * )TransformObj->TransformGetModelViewMatrix() );

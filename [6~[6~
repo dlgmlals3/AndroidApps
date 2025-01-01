@@ -1,0 +1,60 @@
+[1mdiff --git a/1.OpenGLES3.0/9_5_cmyk/app/src/main/assets/shader/CYMKFragment.glsl b/1.OpenGLES3.0/9_5_cmyk/app/src/main/assets/shader/CYMKFragment.glsl[m
+[1mindex bfe4938..d6c637a 100644[m
+[1m--- a/1.OpenGLES3.0/9_5_cmyk/app/src/main/assets/shader/CYMKFragment.glsl[m
+[1m+++ b/1.OpenGLES3.0/9_5_cmyk/app/src/main/assets/shader/CYMKFragment.glsl[m
+[36m@@ -36,4 +36,7 @@[m [mvoid main() {[m
+     else{ // RGB[m
+         outColor = rgb;[m
+     }[m
+[32m+[m[32m    outColor = vec4(vec3(1.0 - cmyk.z),rgb.a);[m
+[32m+[m[32m    outColor = vec4(vec3(1.0 - cmyk.y),rgb.a);[m
+[32m+[m[32m    outColor = vec4(vec3(1.0 - cmyk.z),rgb.a);[m
+ }[m
+\ No newline at end of file[m
+[1mdiff --git a/1.OpenGLES3.0/9_5_cmyk/app/src/main/cpp/Scene/Font.h b/1.OpenGLES3.0/9_5_cmyk/app/src/main/cpp/Scene/Font.h[m
+[1mindex 65aafb1..b817e02 100644[m
+[1m--- a/1.OpenGLES3.0/9_5_cmyk/app/src/main/cpp/Scene/Font.h[m
+[1m+++ b/1.OpenGLES3.0/9_5_cmyk/app/src/main/cpp/Scene/Font.h[m
+[36m@@ -12,7 +12,7 @@[m [mpublic:[m
+     void InitModel();[m
+     Font(char* ttfFile, int Size, Renderer* parent, LanguageType Language= English);[m
+     void printText (char* str, GLfloat Red = 1.0f, GLfloat Green = 1.0f, GLfloat Blue = 1.0f, GLfloat Alpha = 1.0f);[m
+[31m-    void animateText(char* str, GLfloat Red = 1.0f, GLfloat Green = 1.0f, GLfloat Blue = 1.0f, GLfloat Alpha = 1.0f,float radius = 5.0f,float rot = 0.0);[m
+[32m+[m[32m    void animateText(char* str, GLfloat Red = 1.0f, GLfloat Green = 1.0f, GLfloat Blue = 1.0f, GLfloat Alpha = 1.0f,float radius = 5.0f,float rot = 5.0f);[m
+     [m
+ private:[m
+ 	void drawGlyph (const Glyph& gi);[m
+[1mdiff --git a/1.OpenGLES3.0/9_5_cmyk/app/src/main/cpp/Scene/FontSample.cpp b/1.OpenGLES3.0/9_5_cmyk/app/src/main/cpp/Scene/FontSample.cpp[m
+[1mindex 4ff4f03..b8e74f9 100644[m
+[1m--- a/1.OpenGLES3.0/9_5_cmyk/app/src/main/cpp/Scene/FontSample.cpp[m
+[1m+++ b/1.OpenGLES3.0/9_5_cmyk/app/src/main/cpp/Scene/FontSample.cpp[m
+[36m@@ -2,6 +2,7 @@[m
+ #include "Font.h"[m
+ #include <unistd.h> // used for sleep[m
+ extern int CYMKCaseType;[m
+[32m+[m
+ FontSample::FontSample(Renderer* parent)[m
+ {[m
+     RendererHandler     = parent;[m
+[36m@@ -23,7 +24,7 @@[m [mvoid FontSample::Render()[m
+     TransformObj->TransformScale(scale, scale, scale);[m
+     [m
+     if(CYMKCaseType == 0){[m
+[31m-        English->printText((char*)"CYAN Coversions");[m
+[32m+[m[32m        English->printText((char*)"CYAN Coversions dlgmlals3");[m
+     }[m
+     else if(CYMKCaseType == 1){[m
+         English->printText((char*)"MAGENTA Coversions");[m
+[1mdiff --git a/1.OpenGLES3.0/9_5_cmyk/app/src/main/cpp/Scene/Renderer.cpp b/1.OpenGLES3.0/9_5_cmyk/app/src/main/cpp/Scene/Renderer.cpp[m
+[1mindex e51537e..0ea5ef8 100644[m
+[1m--- a/1.OpenGLES3.0/9_5_cmyk/app/src/main/cpp/Scene/Renderer.cpp[m
+[1m+++ b/1.OpenGLES3.0/9_5_cmyk/app/src/main/cpp/Scene/Renderer.cpp[m
+[36m@@ -29,7 +29,7 @@[m [mvoid Renderer::createModels()[m
+ [m
+     strcpy( fname, "/sdcard/Android/data/cookbook.opengles_9_5/Font/" );[m
+     addModel( new SimpleText(this) );[m
+[31m-    addModel( new Font(strcat(fname,"ACUTATR.TTF"), 50, this, English) );[m
+[32m+[m[32m    addModel( new Font(strcat(fname,"DroidSansThai.TTF"), 50, this, English) );[m
+     addModel( new FontSample(this) );[m
+ }[m
+ [m

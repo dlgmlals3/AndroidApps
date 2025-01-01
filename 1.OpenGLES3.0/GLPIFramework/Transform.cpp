@@ -466,7 +466,6 @@ void Transform::TransformTranslate( float x, float y, float z )
 		case MODEL_MATRIX:
 		{
 			*TransformGetModelMatrix() = glm::translate( *TransformGetModelMatrix(), v);
-            
 			break;
 		}
             

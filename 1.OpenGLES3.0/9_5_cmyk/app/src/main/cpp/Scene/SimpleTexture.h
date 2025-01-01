@@ -15,22 +15,21 @@
 #include "glutils.h"
 #include "Renderer.h"
 
-using namespace std;
-enum ShaderType{
-    SimpleShader = 0,
-    HorizontalBlurShader,
-    VerticalBlurShader
-};
+#include <string>
+#include "PngImage.h"
 
-class SimpleTexture : public Model
+using namespace std;
+using namespace namespaceimage;
+
+class SimpleText : public Model
 {
     
 public:
     // Constructor for ObjLoader
-    SimpleTexture( Renderer* parent = 0);
+    SimpleText( Renderer* parent = 0);
     
     // Destructor for ObjLoader
-    ~SimpleTexture();
+    ~SimpleText();
     
     // Initialize our Model class
     void InitModel();
@@ -39,16 +38,16 @@ public:
     void Render();
     
     // Touch Events
-	void TouchEventDown( float x, float y );
-	void TouchEventMove( float x, float y );
-	void TouchEventRelease( float x, float y );
-    
+    void TouchEventDown( float x, float y );
+    void TouchEventMove( float x, float y );
+    void TouchEventRelease( float x, float y );
+    void TakeScreenshot();
 private:
     char MVP;
     char TEX;
-    char SCREEN_CORDINATE_X;
-    char BRIGHTNESS;
+    char SCREEN_COORD_X;
+    char CYMK_CASE;
+    Image* image;
 };
 
-
-#endif /* defined(__SimpleTexture__) */
+#endif // OBJLOADER_H
