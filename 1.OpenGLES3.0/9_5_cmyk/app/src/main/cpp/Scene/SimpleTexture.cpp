@@ -162,6 +162,7 @@ void SimpleText::InitModel()
  */
 void SimpleText::Render()
 {
+    // Texture Rendering
     glUseProgram(program->ProgramID);
     
     // Disable culling

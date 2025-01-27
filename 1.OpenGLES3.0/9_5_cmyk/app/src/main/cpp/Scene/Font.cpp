@@ -150,6 +150,8 @@ void Font::drawGlyph(const Glyph& gi) {
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
+// dlgmlals3
+// 여기서부터 다시 분석하자.
 void Font::printText(char* str, GLfloat Red, GLfloat Green, GLfloat Blue, GLfloat Alpha) {
     // Initialize OpenGL ES States
     glDisable(GL_CULL_FACE);
