@@ -8,8 +8,9 @@ Model::Model(Scene*	handler, Model* model, ModelType type, std::string objectNam
 {
     SceneHandler        = handler;
     modelType           = type;
-//    transformationLocal = glm::mat4();
-//    center              = glm::vec3(0.0, 0.0, 0.0);
+    transformation      = glm::mat4();
+    transformationLocal = glm::mat4();
+    center              = glm::vec3(0.0, 0.0, 0.0);
 }
 
 Model::~Model()
@@ -29,37 +30,37 @@ void Model::InitModel()
 //    }
 }
 
-//void Model::Rotate( float angle, float x, float y, float z )
-//{
-//    transformation = glm::translate( transformation, center);
-//    transformation = glm::rotate( transformation, angle, glm::vec3( x, y, z ) );
-//    transformation = glm::translate( transformation, -center);
-//}
-//
-//void Model::Translate(float x, float y, float z )
-//{
-//    transformation = glm::translate( transformation, glm::vec3( x, y, z ));
-//}
-//
-//void Model::Scale(float x, float y, float z )
-//{
-//    transformation = glm::scale(transformation, glm::vec3( x, y, z ));
-//}
-//
-//void Model::RotateLocal( float angle, float x, float y, float z )
-//{
-//    transformationLocal = glm::rotate( transformationLocal, angle, glm::vec3( x, y, z ) );
-//}
-//
-//void Model::TranslateLocal(float x, float y, float z )
-//{
-//    transformationLocal = glm::translate( transformationLocal, glm::vec3( x, y, z ));
-//}
-//
-//void Model::ScaleLocal(float x, float y, float z )
-//{
-//    transformationLocal = glm::scale(transformationLocal, glm::vec3( x, y, z ));
-//}
+void Model::Rotate( float angle, float x, float y, float z )
+{
+    transformation = glm::translate( transformation, center);
+    transformation = glm::rotate( transformation, angle, glm::vec3( x, y, z ) );
+    transformation = glm::translate( transformation, -center);
+}
+
+void Model::Translate(float x, float y, float z )
+{
+    transformation = glm::translate( transformation, glm::vec3( x, y, z ));
+}
+
+void Model::Scale(float x, float y, float z )
+{
+    transformation = glm::scale(transformation, glm::vec3( x, y, z ));
+}
+
+void Model::RotateLocal( float angle, float x, float y, float z )
+{
+    transformationLocal = glm::rotate( transformationLocal, angle, glm::vec3( x, y, z ) );
+}
+
+void Model::TranslateLocal(float x, float y, float z )
+{
+    transformationLocal = glm::translate( transformationLocal, glm::vec3( x, y, z ));
+}
+
+void Model::ScaleLocal(float x, float y, float z )
+{
+    transformationLocal = glm::scale(transformationLocal, glm::vec3( x, y, z ));
+}
 
 //glm::mat4 Model::GetEyeCoordinatesFromRoot()
 //{

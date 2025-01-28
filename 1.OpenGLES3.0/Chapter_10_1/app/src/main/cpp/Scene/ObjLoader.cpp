@@ -47,7 +47,7 @@ ObjLoader::ObjLoader( Scene* parent, Model* model, MeshType mesh, ModelType type
     glEnable	( GL_DEPTH_TEST );
     ModelNumber = (int)mesh;
     ModelNumber %= sizeof(ModelNames)/(sizeof(char)*STRING_LENGTH);
-    //transformation[0][0] = transformation[1][1] = transformation[2][2] = transformation[3][3] = 1.0;
+    transformation[0][0] = transformation[1][1] = transformation[2][2] = transformation[3][3] = 1.0;
     LoadMesh();
 }
 
@@ -74,9 +74,12 @@ void ObjLoader::SwitchMesh()
 
 void ObjLoader::LoadMesh()
 {
+    LOGI("LOAD MESH");
     char fname[MAX_PATH]= {""};
+
     strcpy( fname, "/data/local/tmp/files/" );
     strcat( fname, ModelNames[ModelNumber]);
+    LOGI("file path : %s", fname);
 
     objMeshModel    = waveFrontObjectModel.ParseObjModel(fname);
     IndexCount      = waveFrontObjectModel.IndexTotal();
@@ -91,7 +94,7 @@ void ObjLoader::LoadMesh()
     glBufferData(GL_ARRAY_BUFFER, objMeshModel->vertices.size() * sizeof(objMeshModel->vertices[0]), &objMeshModel->vertices[0], GL_STATIC_DRAW);
     
     
-    // Create the VAO, this will store the vertex attributes into vector state.
+    // Create the VAO, this will store the vertex attributes into vectore state.
     glGenVertexArrays(1, &OBJ_VAO_Id);
     glBindVertexArray(OBJ_VAO_Id);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
@@ -182,7 +185,7 @@ void ObjLoader::InitModel()
 }
 
 /*!
-	Initialize the scene, reserve shaders, compile and cache program
+	Initialize the scene, reserve shaders, compile and chache program
 
 	\param[in] None.
 	\return None
@@ -194,11 +197,11 @@ void ObjLoader::Render()
     ApplyMaterial();
     ApplyLight();
     
-//    TransformObj->TransformPushMatrix(); // Parent Child Level
-//    *TransformObj->TransformGetModelMatrix() = *TransformObj->TransformGetModelMatrix()*transformation;
-//
-//    TransformObj->TransformPushMatrix(); // Local Level
-//    *TransformObj->TransformGetModelMatrix() = *TransformObj->TransformGetModelMatrix()*transformationLocal;
+    TransformObj->TransformPushMatrix(); // Parent Child Level
+    *TransformObj->TransformGetModelMatrix() = *TransformObj->TransformGetModelMatrix()*transformation;
+
+    TransformObj->TransformPushMatrix(); // Local Level
+    *TransformObj->TransformGetModelMatrix() = *TransformObj->TransformGetModelMatrix()*transformationLocal;
     
     // Apply Transformation.
     glUniformMatrix4fv( MVP, 1, GL_FALSE,( float * )TransformObj->TransformGetModelViewProjectionMatrix() );
@@ -213,10 +216,10 @@ void ObjLoader::Render()
     // Draw Geometry
     glDrawArrays(GL_TRIANGLES, 0, IndexCount );
     glBindVertexArray(0);
-//    TransformObj->TransformPopMatrix(); // Local Level
-//    
-//    Model::Render();
-//    TransformObj->TransformPopMatrix();  // Parent Child Level
+    TransformObj->TransformPopMatrix(); // Local Level
+    
+    Model::Render();
+    TransformObj->TransformPopMatrix();  // Parent Child Level
 }
 
 // Apply scenes light on the object

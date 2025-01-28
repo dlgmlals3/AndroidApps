@@ -8,7 +8,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "cookbook.opengles_10_1"
+        applicationId = "cookbook.opengles_10_2"
         minSdk = 24
         targetSdk = 34
         versionCode = 1

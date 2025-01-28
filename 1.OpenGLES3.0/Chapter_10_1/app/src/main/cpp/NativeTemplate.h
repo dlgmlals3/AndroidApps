@@ -1,13 +1,6 @@
-//
-//  NativeTemplate.h
-//  iOSBlueTriangle
-//
-//  Created by macbook on 8/29/13.
-//  Copyright (c) 2013 macbook. All rights reserved.
-//
-
 #ifndef iOSBlueTriangle_NativeTemplate_h
 #define iOSBlueTriangle_NativeTemplate_h
+
 
 //! OpenGL ES 3.0 Cookcook code
 #include "glutils.h"
@@ -27,6 +20,7 @@ extern "C" {
 	JNIEXPORT void JNICALL Java_cookbook_gles_GLESNativeLib_TouchEventStart(JNIEnv * env, jobject obj, float x, float y );
 	JNIEXPORT void JNICALL Java_cookbook_gles_GLESNativeLib_TouchEventMove(JNIEnv * env, jobject obj, float x, float y );
 	JNIEXPORT void JNICALL Java_cookbook_gles_GLESNativeLib_TouchEventRelease(JNIEnv * env, jobject obj, float x, float y );
+    
 };
 #endif
 

@@ -70,18 +70,18 @@ public:
 
 //    virtual bool IntersectWithRay(Ray ray0, glm::vec3& intersectionPoint);
     
-//    void Rotate( float angle, float x, float y, float z );
-//    
-//    void Translate(float x, float y, float z );
-//    
-//    void Scale(float x, float y, float z );
-//
-//    void RotateLocal( float angle, float x, float y, float z );
-//    
-//    void TranslateLocal(float x, float y, float z );
-//    
-//    void ScaleLocal(float x, float y, float z );
-//    
+    void Rotate( float angle, float x, float y, float z );
+    
+    void Translate(float x, float y, float z );
+    
+    void Scale(float x, float y, float z );
+
+    void RotateLocal( float angle, float x, float y, float z );
+    
+    void TranslateLocal(float x, float y, float z );
+    
+    void ScaleLocal(float x, float y, float z );
+    
 //    glm::mat4 GetEyeCoordinatesFromRoot();
 //
 //    glm::mat4 GetParentTransformation(Model* parent);
@@ -92,9 +92,9 @@ public:
     
     void setSceneHandler(Scene* sceneHandle);
     
-//    void SetCenter(glm::vec3 centerPoint){center = centerPoint;}
-//    
-//    glm::vec3 GetCenter(){ return center; }
+    void SetCenter(glm::vec3 centerPoint){center = centerPoint;}
+    
+    glm::vec3 GetCenter(){ return center; }
 protected:
     /*!
       Store current program ID
@@ -126,20 +126,20 @@ protected:
       */
 	ModelType		modelType;
     
-//    /*!
-//    Transformation of the model
-//     */
-//    glm::mat4 transformation;
-//
-//    /*!
-//     Local transformation of the model
-//     */
-//    glm::mat4 transformationLocal;
-//
-//    /*!
-//     Local transformation of the model
-//     */
-//    glm::vec3 center;
+    /*!
+    Transformation of the model
+     */
+    glm::mat4 transformation;
+
+    /*!
+     Local transformation of the model
+     */
+    glm::mat4 transformationLocal;
+
+    /*!
+     Center at which origin resides.
+     */
+    glm::vec3 center;
     
     Material materialObj;
 

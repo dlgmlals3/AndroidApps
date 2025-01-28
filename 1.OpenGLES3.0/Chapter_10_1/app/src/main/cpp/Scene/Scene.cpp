@@ -293,9 +293,7 @@ void Scene::setUpProjection()
     
     TransformObj.TransformSetMatrixMode( VIEW_MATRIX );
     TransformObj.TransformLoadIdentity();
-    glm::vec3 viewpoint(0.0,0.0,5.0);
-    glm::vec3 center(0.0,0.0,0.0);
-    glm::vec3 up(0.0, 1.0, 0.0);
+    glm::vec3 viewpoint(0.0,4.0,10.0); glm::vec3 center(0.0,0.0,0.0); glm::vec3 up(0.0, 1.0, 0.0);
     TransformObj.TransformLookAt(&viewpoint, &center, &up);
     
     //TransformObj->TransformTranslate(0,0,-4);
