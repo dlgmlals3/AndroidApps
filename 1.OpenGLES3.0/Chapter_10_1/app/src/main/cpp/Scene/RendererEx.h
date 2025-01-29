@@ -19,7 +19,7 @@
 //    virtual void TouchEventRelease( float a, float b ) = 0;
 //};
 
-class Renderer //: public Event
+class Renderer : public Object
 {
     //! Scene List
     std::vector <Scene*> scenes;

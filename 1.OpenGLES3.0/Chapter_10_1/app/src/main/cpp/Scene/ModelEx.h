@@ -5,7 +5,7 @@
 #include "ProgramManager.h"
 #include "Transform.h"
 #include "Material.h"
-//#include "Object.h"
+#include "Object.h"
 
 #include <vector>
 
@@ -14,7 +14,7 @@ class Scene;
 class ProgramManager;
 
 // Parminder: Interface for the rendering models.
-class Model //: public Object //Parminder Obj Rem
+class Model : public Object //Parminder Obj Rem
 {
 public:
     Model(Scene*	SceneHandler, Model* model, ModelType type,std::string objectName = "");
@@ -25,11 +25,11 @@ public:
       */
     virtual void InitModel();
 
-//    /*!
-//      This is called prior to every frame.  Use this
-//      to update your animation.
-//      */
-//	virtual void Update( float t ) {}
+    /*!
+      This is called prior to every frame.  Use this
+      to update your animation.
+      */
+	virtual void Update( float t ) {}
 
     /*!
       Draw your Model.
@@ -95,7 +95,17 @@ public:
     void SetCenter(glm::vec3 centerPoint){center = centerPoint;}
     
     glm::vec3 GetCenter(){ return center; }
-protected:
+    
+    void SetVisible(bool flag, bool applyToChildren = false);
+
+    bool GetVisible(){ return isVisible; }
+    
+    //! Applies parent's transformation, this will be carried on to the children.
+    void ApplyModelsParentsTransformation();
+
+    //! Applies the local transformation, this will not affect the children
+    void ApplyModelsLocalTransformation();
+public: // dlgmlals3 public
     /*!
       Store current program ID
       */
@@ -137,12 +147,26 @@ protected:
     glm::mat4 transformationLocal;
 
     /*!
-     Center at which origin resides.
+     Local transformation of the model
      */
     glm::vec3 center;
     
     Material materialObj;
+    
+    bool isVisible;
 
 };
 
+// Dummy model does render any thing, its used for setting dummy parents.
+class DummyModel : public Model{
+public:
+    // Constructor
+    DummyModel(Scene*	SceneHandler, Model* model, ModelType type,std::string objectName = "");
+
+    // Destructor
+    virtual ~DummyModel();
+
+    // Render the dummy model.
+    void Render();
+};
 #endif // MODEL_H

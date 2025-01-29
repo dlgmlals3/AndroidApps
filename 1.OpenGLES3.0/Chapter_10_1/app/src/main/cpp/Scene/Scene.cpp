@@ -3,7 +3,7 @@
 #include "Button.h"
 
 
-Scene::Scene(std::string name, Renderer* parentObj)//:Object(name, parentObj)
+Scene::Scene(std::string name, Object* parentObj) :Object(name, parentObj)
 {
     renderManager   = NULL;
 //    currentCamera   = NULL;
@@ -112,10 +112,11 @@ void Scene::addModel(Model* model)
     }
     
     // Add root model only
-    //if(model->GetParent() == NULL){ //Parminder Obj Rem
+    if(model->GetParent() == NULL) {
+        LOGI("Add root model : %s", model->name.c_str());
         models.push_back( model );
         model->setSceneHandler(this);
-    //} //Parminder Obj Rem
+    }
 }
 
 //! Add lights
@@ -131,8 +132,7 @@ void Scene::addLight( Light* lightObj)
 
 void Scene::removeModel(Model* model)
 {
-    //Parminder Obj Rem
-    //model->RemoveParent();
+    model->RemoveParent();
     
     for(int i =0; i<models.size(); i++){
         if(model == models.at(i)){
@@ -289,14 +289,12 @@ void Scene::setUpProjection()
     TransformObj.TransformLoadIdentity();
     
     GLfloat aspectRatio = (GLfloat)screenWidth / (GLfloat)screenHeight;
-    TransformObj.TransformSetPerspective(60.0f, aspectRatio, 0.1, 1000, 0);
+    TransformObj.TransformSetPerspective(60.0f, aspectRatio, 1.0, 1000, 0);
     
     TransformObj.TransformSetMatrixMode( VIEW_MATRIX );
     TransformObj.TransformLoadIdentity();
-    glm::vec3 viewpoint(0.0,4.0,10.0); glm::vec3 center(0.0,0.0,0.0); glm::vec3 up(0.0, 1.0, 0.0);
+    glm::vec3 viewpoint(0.0,25.0,30.0); glm::vec3 center(0.0,5.0,0.0); glm::vec3 up(0.0, 1.0, 0.0);
     TransformObj.TransformLookAt(&viewpoint, &center, &up);
-    
-    //TransformObj->TransformTranslate(0,0,-4);
     
     TransformObj.TransformSetMatrixMode( MODEL_MATRIX );
     TransformObj.TransformLoadIdentity();

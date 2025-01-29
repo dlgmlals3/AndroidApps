@@ -40,12 +40,13 @@ LOCAL_SRC_FILES := \
 	$(FRAMEWORK_DIR)/Light.cpp \
 	$(FRAMEWORK_DIR)/Material.cpp \
 	$(SCENE_DIR)/RendererEx.cpp \
+	$(SCENE_DIR)/Object.cpp \
 	$(SCENE_DIR)/ModelEx.cpp \
 	$(SCENE_DIR)/Scene.cpp \
     $(TEXTURE_LIB_PATH)/Image.cpp \
     $(TEXTURE_LIB_PATH)/PngImage.cpp \
-    $(SCENE_DIR)/ObjLoader.cpp \
     $(WAVEFRONTOBJ_LIB_PATH)/WaveFrontOBJ.cpp \
+    $(SCENE_DIR)/ObjLoader.cpp \
     NativeTemplate.cpp
 
 LOCAL_SHARED_LIBRARIES := zlib GLPipng

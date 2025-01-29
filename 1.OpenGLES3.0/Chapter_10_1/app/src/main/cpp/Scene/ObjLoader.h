@@ -27,11 +27,11 @@ class ObjLoader : public Model
 //	void TouchEventDown( float x, float y );
 //	void TouchEventMove( float x, float y );
 //	void TouchEventRelease( float x, float y );
-//
+
 public:
     // Constructor for ObjLoader
     ObjLoader( Scene* parent, Model* model, MeshType mesh, ModelType type);
-
+    ObjLoader( Scene* parent, Model* model, MeshType mesh, ModelType type, std::string name);
     // Destructor for ObjLoader
     virtual ~ObjLoader();
 

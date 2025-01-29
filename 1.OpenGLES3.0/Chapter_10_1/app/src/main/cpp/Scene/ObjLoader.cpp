@@ -37,13 +37,23 @@ char ModelNames[][STRING_LENGTH]= {"SemiHollowCylinder.obj"/*0*/,"Sphere.obj"/*1
 	\return None
 
 */
-ObjLoader::ObjLoader( Scene* parent, Model* model, MeshType mesh, ModelType type ):Model(parent, model, type)
+ObjLoader::ObjLoader( Scene* parent, Model* model, MeshType mesh, ModelType type ) : Model(parent, model, type)
 {
 	if (!parent)
 		return;
 
-	ProgramManagerObj	= SceneHandler->SceneProgramManager();
-	TransformObj		= SceneHandler->SceneTransform();
+    glEnable	( GL_DEPTH_TEST );
+    ModelNumber = (int)mesh;
+    ModelNumber %= sizeof(ModelNames)/(sizeof(char)*STRING_LENGTH);
+    transformation[0][0] = transformation[1][1] = transformation[2][2] = transformation[3][3] = 1.0;
+    LoadMesh();
+}
+
+ObjLoader::ObjLoader( Scene* parent, Model* model, MeshType mesh, ModelType type, std::string name) : Model(parent, model, type, name)
+{
+    if (!parent)
+        return;
+
     glEnable	( GL_DEPTH_TEST );
     ModelNumber = (int)mesh;
     ModelNumber %= sizeof(ModelNames)/(sizeof(char)*STRING_LENGTH);
@@ -198,25 +208,27 @@ void ObjLoader::Render()
     ApplyLight();
     
     TransformObj->TransformPushMatrix(); // Parent Child Level
-    *TransformObj->TransformGetModelMatrix() = *TransformObj->TransformGetModelMatrix()*transformation;
+    ApplyModelsParentsTransformation();
 
-    TransformObj->TransformPushMatrix(); // Local Level
-    *TransformObj->TransformGetModelMatrix() = *TransformObj->TransformGetModelMatrix()*transformationLocal;
-    
-    // Apply Transformation.
-    glUniformMatrix4fv( MVP, 1, GL_FALSE,( float * )TransformObj->TransformGetModelViewProjectionMatrix() );
-    glUniformMatrix4fv( MV, 1, GL_FALSE,( float * )TransformObj->TransformGetModelViewMatrix() );
-    glm::mat4 matrix    = *(TransformObj->TransformGetModelViewMatrix());
-    glm::mat3 normalMat = glm::mat3( glm::vec3(matrix[0]), glm::vec3(matrix[1]), glm::vec3(matrix[2]) );
-    glUniformMatrix3fv( NormalMatrix, 1, GL_FALSE, (float*)&normalMat );
-    
-    // Bind with Vertex Array Object for OBJ
-    glBindVertexArray(OBJ_VAO_Id);
-    
-    // Draw Geometry
-    glDrawArrays(GL_TRIANGLES, 0, IndexCount );
-    glBindVertexArray(0);
-    TransformObj->TransformPopMatrix(); // Local Level
+    if(isVisible){
+        TransformObj->TransformPushMatrix(); // Local Level
+        ApplyModelsLocalTransformation();
+        
+        // Apply Transformation.
+        glUniformMatrix4fv( MVP, 1, GL_FALSE,( float * )TransformObj->TransformGetModelViewProjectionMatrix() );
+        glUniformMatrix4fv( MV, 1, GL_FALSE,( float * )TransformObj->TransformGetModelViewMatrix() );
+        glm::mat4 matrix    = *(TransformObj->TransformGetModelViewMatrix());
+        glm::mat3 normalMat = glm::mat3( glm::vec3(matrix[0]), glm::vec3(matrix[1]), glm::vec3(matrix[2]) );
+        glUniformMatrix3fv( NormalMatrix, 1, GL_FALSE, (float*)&normalMat );
+        
+        // Bind with Vertex Array Object for OBJ
+        glBindVertexArray(OBJ_VAO_Id);
+        
+        // Draw Geometry
+        glDrawArrays(GL_TRIANGLES, 0, IndexCount );
+        glBindVertexArray(0);
+        TransformObj->TransformPopMatrix(); // Local Level
+    }
     
     Model::Render();
     TransformObj->TransformPopMatrix();  // Parent Child Level

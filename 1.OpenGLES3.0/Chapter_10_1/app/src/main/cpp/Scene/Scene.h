@@ -5,17 +5,16 @@
 #include "Transform.h"
 //#include "Camera.h"
 #include "Light.h"
-//#include "Event.h"
 #include <vector>
 
 class Renderer;
 
-class Scene //: public Event
+class Scene : public Object
 {
     
 public:
     //! Default Constructor
-    Scene(std::string name = "", Renderer* parentObj = NULL);
+    Scene(std::string name = "", Object* parentObj = NULL);
     
     //! Destructor
     virtual ~Scene(void);
@@ -35,8 +34,8 @@ public:
     //! Screen Height returned
     inline int screenHeightPixel() { return screenHeight; }
     
-    //! Generate the models
-    //void createModels();
+//    //! Generate the models
+//    void createModels();
     
     //! Render the Models
     void render();
@@ -53,7 +52,7 @@ public:
     //! Get the model
     Model* getModel( ModelType );
     
-    //! Add into model list
+    //! Cache the model
     void addModel( Model* );
 
     //! Add lights
