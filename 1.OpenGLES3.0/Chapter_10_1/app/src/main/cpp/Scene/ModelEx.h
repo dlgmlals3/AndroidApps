@@ -6,6 +6,8 @@
 #include "Transform.h"
 #include "Material.h"
 #include "Object.h"
+#include "Ray.h"
+#include "Event.h"
 
 #include <vector>
 
@@ -14,7 +16,7 @@ class Scene;
 class ProgramManager;
 
 // Parminder: Interface for the rendering models.
-class Model : public Object //Parminder Obj Rem
+class Model : public Object, public GestureEvent
 {
 public:
     Model(Scene*	SceneHandler, Model* model, ModelType type,std::string objectName = "");
@@ -62,13 +64,13 @@ public:
       */
 	virtual void releaseStates(){}
 
-//    virtual void TouchEventDown( float a, float b );
-//
-//    virtual void TouchEventMove( float a, float b );
-//
-//    virtual void TouchEventRelease( float a, float b );
+    void TouchEventDown( float a, float b );
 
-//    virtual bool IntersectWithRay(Ray ray0, glm::vec3& intersectionPoint);
+    void TouchEventMove( float a, float b );
+
+    void TouchEventRelease( float a, float b );
+
+    virtual bool IntersectWithRay(Ray ray0, glm::vec3& intersectionPoint);
     
     void Rotate( float angle, float x, float y, float z );
     
@@ -82,9 +84,9 @@ public:
     
     void ScaleLocal(float x, float y, float z );
     
-//    glm::mat4 GetEyeCoordinatesFromRoot();
-//
-//    glm::mat4 GetParentTransformation(Model* parent);
+    glm::mat4 GetEyeCoordinatesFromRoot();
+
+    glm::mat4 GetParentTransformation(Model* parent);
 
     void SetMaterial(Material mat){ materialObj = mat; }
     
@@ -105,7 +107,7 @@ public:
 
     //! Applies the local transformation, this will not affect the children
     void ApplyModelsLocalTransformation();
-public: // dlgmlals3 public
+protected:
     /*!
       Store current program ID
       */

@@ -30,7 +30,7 @@ public:
     
     std::vector<Object*>* GetChildren();
 
-public:
+protected:
 
     /*!
      Model's name

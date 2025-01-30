@@ -77,27 +77,27 @@ void Renderer::render()
     }
 }
 
-////! Gesture Press Event
-//void Renderer::TouchEventDown( float x, float y )
-//{
-//    for( int i=0; i<scenes.size();  i++ ){
-//        scenes.at(i)->TouchEventDown(x, y);
-//    }
-//}
-//
-////! Gesture Move Event
-//void Renderer::TouchEventMove( float x, float y )
-//{
-//    for( int i=0; i<scenes.size();  i++ ){
-//        scenes.at(i)->TouchEventMove(x, y);
-//    }
-//}
-//
-////! Gesture Release Event
-//void Renderer::TouchEventRelease( float x, float y )
-//{
-//    for( int i=0; i<scenes.size();  i++ ){
-//        scenes.at(i)->TouchEventRelease(x, y);
-//    }
-//}
+//! Gesture Press Event
+void Renderer::TouchEventDown( float x, float y )
+{
+    for( int i=0; i<scenes.size();  i++ ){
+        scenes.at(i)->TouchEventDown(x, y);
+    }
+}
+
+//! Gesture Move Event
+void Renderer::TouchEventMove( float x, float y )
+{
+    for( int i=0; i<scenes.size();  i++ ){
+        scenes.at(i)->TouchEventMove(x, y);
+    }
+}
+
+//! Gesture Release Event
+void Renderer::TouchEventRelease( float x, float y )
+{
+    for( int i=0; i<scenes.size();  i++ ){
+        scenes.at(i)->TouchEventRelease(x, y);
+    }
+}
 

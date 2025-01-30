@@ -9,42 +9,61 @@
 // http://neurovit.deviantart.com/art/simplicio-92311415
 
 Renderer* graphicsEngine;
-Scene* scene1;
-ObjLoader* Sphere;
-ObjLoader* BaseSphere;
-ObjLoader* Cube[2];
-ObjLoader* child;
+Scene* scene1           = NULL;
+ObjLoader* Base         = NULL;
+ObjLoader* Stand        = NULL;
+ObjLoader* MotorShaft   = NULL;
+ObjLoader* CubePlane    = NULL;
+ObjLoader* Sphere       = NULL;
+ObjLoader* Torus        = NULL;
+ObjLoader* Suzzane      = NULL;
 
 bool GraphicsInit()
 {
     graphicsEngine = new Renderer();
     scene1 = new Scene("MeshScene", graphicsEngine);
     scene1->addLight(new Light(Material(MaterialWhite),glm::vec4(0.0, 0.0, 10.0, 1.0)));
-
-    BaseSphere =  new ObjLoader	( scene1, NULL, SPHERE, None , "SphereRoot");
-    ObjLoader* BaseSphere2 =  new ObjLoader	( scene1, NULL, SPHERE, None , "SphereRoot2");
-
-
-
-    BaseSphere->SetMaterial(Material(MaterialGold));
-    BaseSphere->ScaleLocal(1.5,1.5,1.5);
-
-    int j = 0;
-    for(int i=-1; i<2; i+=2){
-        Cube[j] =  new ObjLoader	( scene1, BaseSphere, CUBE, None, "Cube" );
-
-        Cube[j]->SetMaterial(Material(MaterialCopper));
-        Cube[j]->Translate(10.0 * i, 0.0, 0.0);
-        for(int i=-1; i<2; i+=2){
-            Sphere =  new ObjLoader	( scene1, Cube[j], SPHERE, None, "Spehere");
-
-            Sphere->SetMaterial(Material(MaterialSilver));
-            Sphere->Translate(0.0, -5.0 * i, 0.0);
-        }
-        j++;
+    
+    // Base
+    Base =  new ObjLoader	( scene1, NULL, CUBE, None );
+    Base->SetMaterial(Material(MaterialSilver));
+    Base->SetName(std::string("Base"));
+    Base->ScaleLocal(1.5, 0.25, 1.5);
+    
+    // Stand
+    Stand =  new ObjLoader	( scene1, Base, SEMI_HOLLOW_CYLINDER, None );
+    Stand->SetMaterial(Material(MaterialSilver));
+    Stand->SetName(std::string("Stand"));
+    Stand->Translate(0.0, 4.0, 0.0);
+    Stand->SetCenter(glm::vec3(0.0, -4.0, 0.0));
+    Stand->ScaleLocal(0.5, 4.0, 0.5);
+    
+    // Motor Shaft
+    MotorShaft =  new ObjLoader	( scene1, Stand, CUBE, None );
+    MotorShaft->SetMaterial(Material(MaterialSilver));
+    MotorShaft->SetName(std::string("MotorShaft"));
+    MotorShaft->Translate(0.0, 4.0, 1.0);
+    MotorShaft->SetCenter(glm::vec3(0.0, -4.0, -1.0));
+    MotorShaft->ScaleLocal(0.5, 0.5, 2.0);
+    
+    // Motor Engine
+    Sphere =  new ObjLoader	( scene1, MotorShaft, SPHERE, None );
+    Sphere->SetMaterial(Material(MaterialGold));
+    Sphere->Translate(0.0, 0.0, 2.0);
+    Sphere->SetCenter(glm::vec3(0.0, 0.0, -2.0));
+    Sphere->SetName(std::string("Sphere"));
+    
+    // Fan Blades
+    for(int i=0; i<360; i+=360/18){
+        CubePlane =  new ObjLoader	( scene1, Sphere, CUBE, None );
+        CubePlane->SetMaterial(Material(MaterialCopper));
+        CubePlane->SetName(std::string("FanBlade"));
+        CubePlane->Translate(0.0, 2.0, 0.0);
+        CubePlane->SetCenter(glm::vec3(0.0, -2.0, 0.0));
+        CubePlane->ScaleLocal(0.20, 2.0, 0.20);
+        CubePlane->Rotate(i, 0.0, 0.0, 1.0);
     }
-    scene1->addModel( BaseSphere);
-    scene1->addModel( BaseSphere2);
+    scene1->addModel( Base);
     graphicsEngine->initializeScenes();
     return true;
 }
@@ -57,9 +76,8 @@ bool GraphicsResize( int width, int height )
 
 bool GraphicsRender()
 {
-    BaseSphere->Rotate(1.0, 0.0, 1.0, 0.0);
-    Cube[0]->Rotate(-1.0, 1.0, 0.0, 0.0);
-    Cube[1]->Rotate( 1.0, 1.0, 0.0, 0.0);
+    Sphere->Rotate(0.10, 0.0, 0.0, 1.0);
+    Base->Rotate(0.10, 0.0, 1.0, 0.0);
 	graphicsEngine->render();
 
     return true;
@@ -67,17 +85,17 @@ bool GraphicsRender()
 
 void TouchEventDown( float x, float y )
 {
-	//graphicsEngine->TouchEventDown( x, y );
+	graphicsEngine->TouchEventDown( x, y );
 }
 
 void TouchEventMove( float x, float y )
 {
-	//graphicsEngine->TouchEventMove( x, y );
+	graphicsEngine->TouchEventMove( x, y );
 }
 
 void TouchEventRelease( float x, float y )
 {
-	//graphicsEngine->TouchEventRelease( x, y );
+	graphicsEngine->TouchEventRelease( x, y );
 }
 
 

@@ -5,11 +5,12 @@
 #include "Transform.h"
 //#include "Camera.h"
 #include "Light.h"
+#include "Event.h"
 #include <vector>
 
 class Renderer;
 
-class Scene : public Object
+class Scene : public Object, public GestureEvent
 {
     
 public:
@@ -34,8 +35,8 @@ public:
     //! Screen Height returned
     inline int screenHeightPixel() { return screenHeight; }
     
-//    //! Generate the models
-//    void createModels();
+    //! Generate the models
+    void createModels();
     
     //! Render the Models
     void render();
@@ -71,12 +72,12 @@ public:
     void setRenderer( Renderer* renderer);
     
     void removeModel(Model*);
-//    
-//    void TouchEventDown( float a, float b );
-//    
-//    void TouchEventMove( float a, float b );
-//    
-//    void TouchEventRelease( float a, float b );
+    
+    void TouchEventDown( float a, float b );
+    
+    void TouchEventMove( float a, float b );
+    
+    void TouchEventRelease( float a, float b );
     
     //! resize screen
     void resize( int w, int h );

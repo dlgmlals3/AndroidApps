@@ -65,20 +65,18 @@ void Model::ScaleLocal(float x, float y, float z )
     transformationLocal = glm::scale(transformationLocal, glm::vec3( x, y, z ));
 }
 
-//glm::mat4 Model::GetEyeCoordinatesFromRoot()
-//{
-    //Parminder Obj Rem
-//    return GetParentTransformation(dynamic_cast<Model*>(parent)) * transformation * transformationLocal;
-//}
+glm::mat4 Model::GetEyeCoordinatesFromRoot()
+{
+    return  GetParentTransformation(dynamic_cast<Model*>(parent)) * transformation * transformationLocal;
+}
 
-//glm::mat4 Model::GetParentTransformation(Model* parent)
-//{
-    //Parminder Obj Rem
-//    if(parent){
-//        return parent->transformation * GetParentTransformation(dynamic_cast<Model*>(parent->parent));
-//    }
-//    return glm::mat4(); // return identity matrix.
-//}
+glm::mat4 Model::GetParentTransformation(Model* parent)
+{
+    if(parent){
+        return  GetParentTransformation(dynamic_cast<Model*>(parent->parent)) * parent->transformation;
+    }
+    return glm::mat4(); // return identity matrix.
+}
 
 void Model::Render()
 {
@@ -87,36 +85,34 @@ void Model::Render()
     }
 }
 
-//bool Model::IntersectWithRay(Ray ray0, glm::vec3& intersectionPoint)
-//{
-//    
-//}
+bool Model::IntersectWithRay(Ray ray0, glm::vec3& intersectionPoint)
+{
+    
+}
 
-//void Model::TouchEventDown( float x, float y )
-//{
-//    for(int i =0; i<childList.size(); i++){
-//        dynamic_cast<Model*>(childList.at(i))->TouchEventDown( x, y );
-//    }
-//}
-//
-//void Model::TouchEventMove( float x, float y )
-//{
-//    for(int i =0; i<childList.size(); i++){
-//        dynamic_cast<Model*>(childList.at(i))->TouchEventMove( x, y );
-//    }
-//}
-//
-//void Model::TouchEventRelease( float x, float y )
-//{
-//    for(int i =0; i<childList.size(); i++){
-//        dynamic_cast<Model*>(childList.at(i))->TouchEventRelease( x, y );
-//    }
-//}
+void Model::TouchEventDown( float x, float y )
+{
+    for(int i =0; i<childList.size(); i++){
+        dynamic_cast<Model*>(childList.at(i))->TouchEventDown( x, y );
+    }
+}
+
+void Model::TouchEventMove( float x, float y )
+{
+    for(int i =0; i<childList.size(); i++){
+        dynamic_cast<Model*>(childList.at(i))->TouchEventMove( x, y );
+    }
+}
+
+void Model::TouchEventRelease( float x, float y )
+{
+    for(int i =0; i<childList.size(); i++){
+        dynamic_cast<Model*>(childList.at(i))->TouchEventRelease( x, y );
+    }
+}
 
 void Model::setSceneHandler(Scene* sceneHandle){
     SceneHandler = sceneHandle;
-    //LOGI("dlgmlals3 modelType : %d %p", modelType, this);
-
     for(int i =0; i<childList.size(); i++){
         dynamic_cast<Model*>(childList.at(i))->setSceneHandler( sceneHandle );
     }

@@ -134,17 +134,20 @@ namespace glm
 		genType tvec = orig - vert0;
 
 		position.y = dot(tvec, pvec) * inv_det;
-		if (position.y < typename genType::value_type(0) || position.y > typename genType::value_type(1))
-			return false;
+		if (position.y < typename genType::value_type(0) || position.y > typename genType::value_type(1)) {
+            //LOGI("dlgmlals3  1 false : %f ", position.y);
+            return false;
+        }
 
 		genType qvec = cross(tvec, edge1);
-
 		position.z = dot(dir, qvec) * inv_det;
-		if (position.z < typename genType::value_type(0) || position.y + position.z > typename genType::value_type(1))
-			return false;
+        // dlgmlals3 1-->2로 바꿈.. 왜그런지.
+		if (position.z < typename genType::value_type(0) || position.y + position.z > typename genType::value_type(1)) {
+            return false;
+        }
 
 		position.x = dot(edge2, qvec) * inv_det;
-
+        //LOGI("dlgmlals3 success : %f " , position.x);
 		return true;
 	}
 

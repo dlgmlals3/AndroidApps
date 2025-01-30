@@ -26,28 +26,31 @@ LOCAL_C_INCLUDES := $(GLM_SRC_PATH)/core \
         $(LIB3DS_DIR) \
         $(WAVEFRONTOBJ_LIB_PATH) \
 		$(FRAMEWORK_DIR) \
+		$(FRAMEWORK_DIR)/Geometry \
 		$(SCENE_DIR) \
         $(MISC_DIR) \
 		$(TEXTURE_LIB_PATH)
 LOCAL_C_INCLUDES += $(FONT_PATH)/FreeType/include
 
 LOCAL_SRC_FILES := \
-    $(FRAMEWORK_DIR)/GLutils.cpp \
-    $(FRAMEWORK_DIR)/Cache.cpp \
-    $(FRAMEWORK_DIR)/ShaderManager.cpp \
-    $(FRAMEWORK_DIR)/ProgramManager.cpp \
-    $(FRAMEWORK_DIR)/Transform.cpp \
+    	$(FRAMEWORK_DIR)/GLutils.cpp \
+	$(FRAMEWORK_DIR)/Cache.cpp \
+    	$(FRAMEWORK_DIR)/ShaderManager.cpp \
+    	$(FRAMEWORK_DIR)/ProgramManager.cpp \
+    	$(FRAMEWORK_DIR)/Transform.cpp \
 	$(FRAMEWORK_DIR)/Light.cpp \
 	$(FRAMEWORK_DIR)/Material.cpp \
+	$(FRAMEWORK_DIR)/Geometry/Ray.cpp \
 	$(SCENE_DIR)/RendererEx.cpp \
 	$(SCENE_DIR)/Object.cpp \
 	$(SCENE_DIR)/ModelEx.cpp \
 	$(SCENE_DIR)/Scene.cpp \
-    $(TEXTURE_LIB_PATH)/Image.cpp \
-    $(TEXTURE_LIB_PATH)/PngImage.cpp \
-    $(WAVEFRONTOBJ_LIB_PATH)/WaveFrontOBJ.cpp \
-    $(SCENE_DIR)/ObjLoader.cpp \
-    NativeTemplate.cpp
+	$(SCENE_DIR)/Event.cpp \
+    	$(TEXTURE_LIB_PATH)/Image.cpp \
+    	$(TEXTURE_LIB_PATH)/PngImage.cpp \
+    	$(WAVEFRONTOBJ_LIB_PATH)/WaveFrontOBJ.cpp \
+    	$(SCENE_DIR)/ObjLoader.cpp \
+    	NativeTemplate.cpp
 
 LOCAL_SHARED_LIBRARIES := zlib GLPipng
 

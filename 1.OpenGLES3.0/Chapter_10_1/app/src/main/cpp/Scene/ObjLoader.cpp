@@ -46,18 +46,7 @@ ObjLoader::ObjLoader( Scene* parent, Model* model, MeshType mesh, ModelType type
     ModelNumber = (int)mesh;
     ModelNumber %= sizeof(ModelNames)/(sizeof(char)*STRING_LENGTH);
     transformation[0][0] = transformation[1][1] = transformation[2][2] = transformation[3][3] = 1.0;
-    LoadMesh();
-}
-
-ObjLoader::ObjLoader( Scene* parent, Model* model, MeshType mesh, ModelType type, std::string name) : Model(parent, model, type, name)
-{
-    if (!parent)
-        return;
-
-    glEnable	( GL_DEPTH_TEST );
-    ModelNumber = (int)mesh;
-    ModelNumber %= sizeof(ModelNames)/(sizeof(char)*STRING_LENGTH);
-    transformation[0][0] = transformation[1][1] = transformation[2][2] = transformation[3][3] = 1.0;
+    isPicked = false;
     LoadMesh();
 }
 
@@ -186,7 +175,7 @@ void ObjLoader::InitModel()
     LightDiffuse     = ProgramManagerObj->ProgramGetUniformLocation(program,(char*)"LightDiffuse");
     LightPosition     = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"LightPosition");
     
-    
+    Picking = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"Picked");
     MVP = ProgramManagerObj->ProgramGetUniformLocation( program, ( char* )"ModelViewProjectionMatrix" );
     MV  = ProgramManagerObj->ProgramGetUniformLocation( program, ( char* )"ModelViewMatrix" );
     NormalMatrix  = ProgramManagerObj->ProgramGetUniformLocation(program, (char*)"NormalMatrix");
@@ -195,7 +184,7 @@ void ObjLoader::InitModel()
 }
 
 /*!
-	Initialize the scene, reserve shaders, compile and chache program
+	Initialize the scene, reserve shaders, compile and cache program
 
 	\param[in] None.
 	\return None
@@ -206,6 +195,17 @@ void ObjLoader::Render()
     glUseProgram(program->ProgramID);
     ApplyMaterial();
     ApplyLight();
+    if(isPicked){
+        if ( Picking >= 0 ){
+            glUniform1i(Picking, 1);
+        }
+    }
+    else{
+        if ( Picking >= 0 ){
+            glUniform1i(Picking, 0);
+        }
+    }
+
     
     TransformObj->TransformPushMatrix(); // Parent Child Level
     ApplyModelsParentsTransformation();
@@ -281,54 +281,91 @@ void ObjLoader::ApplyMaterial()
 }
 
 
-//bool ObjLoader::IntersectWithRay(Ray ray0, glm::vec3& intersectionPoint)
-//{
-//    int index0, index1, index2;
-//
-//    // COMPUTE EACH TRIANGLE AND PERFORM INTERSECTION.
-//    for( uint i = 0; i < objMeshModel->vertices.size(); i += 3 )
-//    {
-//        vec4 p0 = vec4(objMeshModel->vertices.at(i).position, 1.0);
-//        vec4 p1 = vec4(objMeshModel->vertices.at(i+1).position, 1.0);
-//        vec4 p2 = vec4(objMeshModel->vertices.at(i+2).position, 1.0);
-//
-//        p0 = *TransformObj->TransformGetModelMatrix()*GetEyeCoordinatesFromRoot() * p0;
-//        p1 = *TransformObj->TransformGetModelMatrix()*GetEyeCoordinatesFromRoot() * p1;
-//        p2 = *TransformObj->TransformGetModelMatrix()*GetEyeCoordinatesFromRoot() * p2;
-//        if ( glm::intersectLineTriangle(ray0.destination, ray0.direction, vec3(p0.x,p0.y,p0.z), vec3(p1.x,p1.y,p1.z), vec3(p2.x,p2.y,p2.z), intersectionPoint)){
-//            return true;
-//        }
-//    }
-//    return false;
-//}
+bool ObjLoader::IntersectWithRay(Ray ray0, glm::vec3& intersectionPoint)
+{
+    int index0, index1, index2;
 
-//void ObjLoader::TouchEventDown( float x, float y )
-//{
-////    GLint viewport_matrix[4]	= { 0, 0, 0, 0 };
-////    glGetIntegerv( GL_VIEWPORT, viewport_matrix );
-////    glm::vec4 viewport(viewport_matrix[0],viewport_matrix[1],viewport_matrix[2],viewport_matrix[3]);
-////    glm::vec3 win(x, viewport_matrix[3]/2-y, 0.0);
-////    glm::mat4 a, b;
-////    //glm::unProject(win, a, b, viewport);
-////    glm::vec3 nearPoint = glm::unProject(win, *TransformObj->TransformGetModelViewMatrix(), *TransformObj->TransformGetProjectionMatrix(), viewport);
-////    win.z = 1.0;
-////    glm::vec3 farPoint = glm::unProject(win, *TransformObj->TransformGetModelViewMatrix(), *TransformObj->TransformGetProjectionMatrix(), viewport);
-////    Ray ray0(nearPoint, farPoint-nearPoint);
-////    
-////    glm::vec3 intersectionPoint;
-////    
-////    if(IntersectWithRay( ray0, intersectionPoint)){
-////        //printf("Intersect with %s", this->GetName().c_str()); ////Parminder Obj Rem
-////        printf("\nTYN:%s\n", typeid(this).name());
-////    }
-//
-////    Model::TouchEventDown(x,y);
-//}
-//
-//void ObjLoader::TouchEventMove( float x, float y )
-//{
-//}
-//
-//void ObjLoader::TouchEventRelease( float x, float y )
-//{
-//}
+    // COMPUTE EACH TRIANGLE AND PERFORM INTERSECTION.
+    for( uint i = 0; i < objMeshModel->vertices.size(); i += 3 )
+    {
+        vec4 p0 = vec4(objMeshModel->vertices.at(i).position, 1.0);
+        vec4 p1 = vec4(objMeshModel->vertices.at(i+1).position, 1.0);
+        vec4 p2 = vec4(objMeshModel->vertices.at(i+2).position, 1.0);
+
+        p0 = *TransformObj->TransformGetModelMatrix()*GetEyeCoordinatesFromRoot() * p0;
+        p1 = *TransformObj->TransformGetModelMatrix()*GetEyeCoordinatesFromRoot() * p1;
+        p2 = *TransformObj->TransformGetModelMatrix()*GetEyeCoordinatesFromRoot() * p2;
+        if ( glm::intersectLineTriangle(ray0.destination, ray0.direction, vec3(p0.x,p0.y,p0.z), vec3(p1.x,p1.y,p1.z), vec3(p2.x,p2.y,p2.z), intersectionPoint)){
+            return true;
+        }
+    }
+    return false;
+}
+
+void ObjLoader::TouchEventDown( float x, float y )
+{
+    // LOGI("dlgmlals3 touch %f %f", x, y);
+    GLint viewport_matrix[4]	= { 0, 0, 0, 0 };
+    glGetIntegerv( GL_VIEWPORT, viewport_matrix );
+    glm::vec4 viewport(viewport_matrix[0],viewport_matrix[1],viewport_matrix[2],viewport_matrix[3]);
+    // LOGI("viewport : %d %d %d %d", viewport_matrix[0], viewport_matrix[1], viewport_matrix[2], viewport_matrix[3]);
+    viewport = vec4(0, 0, 1344, 2992);
+
+    // 이놈이 0 0 0 0 나옴 - -;;; 문제임 원래는 ( 0 0 1340 2800 ) 뭐 이런식으로 나와야하는데
+    // LOGI("dlgmlals3 viewport_matrix %d %d %d %d",  viewport_matrix[0],viewport_matrix[1], viewport_matrix[2], viewport_matrix[3]);
+    // LOGI("dlgmlals3 Screen %f %f %f",  win.x, win.y, win.z);
+
+    // clip-space=projectionMatrix×viewMatrix×modelMatrix×vertex
+    glm::mat4 a, b;
+    glm::mat4 modelView = *TransformObj->TransformGetModelViewMatrix();
+    glm::mat4 projectView  = *TransformObj->TransformGetProjectionMatrix();
+
+    // dlgamlls3
+    /*glm::mat4 invProjectionView = glm::inverse(projectView * modelView);
+    glm::vec4 nearClip = invProjectionView * glm::vec4(win.x, win.y, -1.0, 1.0);
+    glm::vec3 nearPoint = glm::vec3(nearClip) / nearClip.w;
+    */
+
+    glm::vec3 win(x, viewport[3]-y, 0.0);
+    win.z = 0;
+    glm::vec3 nearPoint = glm::unProject(
+          win,
+          *TransformObj->TransformGetModelViewMatrix(),
+          *TransformObj->TransformGetProjectionMatrix(),
+          viewport);
+    win.z = 1;
+    glm::vec3 farPoint = glm::unProject(
+            win,
+            *TransformObj->TransformGetModelViewMatrix(),
+            *TransformObj->TransformGetProjectionMatrix(),
+            viewport);
+
+
+    glm::vec3 dir = normalize(farPoint - nearPoint);
+    Ray ray0(nearPoint, dir);
+/*
+
+    LOGI("dlgmlals3 farPoint : %f %f %f", farPoint[0], farPoint[1], farPoint[2]);
+
+*/
+
+    glm::vec3 intersectionPoint;
+    if(IntersectWithRay (ray0, intersectionPoint)){
+       LOGI("dlgmlals3 Intersected %s (%f %f %f)", this->GetName().c_str()
+             , intersectionPoint[0], intersectionPoint[1], intersectionPoint[2]);
+        isPicked = !isPicked;
+    }
+    /*LOGI("dlgmlals3 nearPoint : %f %f %f", nearPoint[0], nearPoint[1], nearPoint[2]);
+    LOGI("dlgmlals3 dir : %f %f %f", dir[0], dir[1], dir[2]);
+    LOGI("dlgmlals3 intersectionPoint : %f %f %f", intersectionPoint[0], intersectionPoint[1], intersectionPoint[2]);*/
+
+    Model::TouchEventDown(x,y);
+}
+
+void ObjLoader::TouchEventMove( float x, float y )
+{
+}
+
+void ObjLoader::TouchEventRelease( float x, float y )
+{
+}

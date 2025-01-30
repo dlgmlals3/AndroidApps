@@ -23,15 +23,15 @@ enum MeshType{
 class ObjLoader : public Model
 {
     
-//public:
-//	void TouchEventDown( float x, float y );
-//	void TouchEventMove( float x, float y );
-//	void TouchEventRelease( float x, float y );
+public:
+	void TouchEventDown( float x, float y );
+	void TouchEventMove( float x, float y );
+	void TouchEventRelease( float x, float y );
 
 public:
     // Constructor for ObjLoader
     ObjLoader( Scene* parent, Model* model, MeshType mesh, ModelType type);
-    ObjLoader( Scene* parent, Model* model, MeshType mesh, ModelType type, std::string name);
+
     // Destructor for ObjLoader
     virtual ~ObjLoader();
 
@@ -47,7 +47,7 @@ public:
     // Apply material on the object
     void ApplyMaterial();
 
-//    bool IntersectWithRay(Ray ray0, glm::vec3& intersectionPoint);
+    bool IntersectWithRay(Ray ray0, glm::vec3& intersectionPoint);
 
 private:
     // Load the mesh model
@@ -87,6 +87,7 @@ private:
     GLint NormalMatrix;
     int ModelNumber = 0;
     GLuint vertexBuffer;
+    bool isPicked;
     
     
     // Material variables
@@ -100,6 +101,8 @@ private:
     char LightSpecular;
     char LightDiffuse;
     char LightPosition;
+    char Picking;
 };
+
 
 #endif // OBJLOADER_H

@@ -3,7 +3,7 @@
 #include "Button.h"
 
 
-Scene::Scene(std::string name, Object* parentObj) :Object(name, parentObj)
+Scene::Scene(std::string name, Object* parentObj):Object(name, parentObj)
 {
     renderManager   = NULL;
 //    currentCamera   = NULL;
@@ -27,9 +27,9 @@ void Scene::initializeScene()
     setUpModels();
 }
 
-//void Scene::createModels()
-//{
-//}
+void Scene::createModels()
+{
+}
 
 /*!
 	Remove all the Model classes from the Scene.
@@ -70,8 +70,8 @@ void Scene::resize(int w, int h)
  */
 void Scene::setUpModels()
 {
-//    // ! Generate the models and cache all
-//    createModels();
+    // ! Generate the models and cache all
+    createModels();
     
     //! Do the init stuff as per model requirements
     initializeModels();
@@ -112,8 +112,7 @@ void Scene::addModel(Model* model)
     }
     
     // Add root model only
-    if(model->GetParent() == NULL) {
-        LOGI("Add root model : %s", model->name.c_str());
+    if(model->GetParent() == NULL){
         models.push_back( model );
         model->setSceneHandler(this);
     }
@@ -165,47 +164,47 @@ void Scene::setRenderer( Renderer* renderer)
     renderManager = renderer;
 }
 
-///*!
-//	This function handle Touch event down action.
-// 
-//	\param[in] x and y screen pixel position.
-// 
-//	\return None.
-// */
-//void Scene::TouchEventDown( float x, float y )
-//{
-//    for( int i=0; i<models.size(); i++ ){
-//        models.at(i)->TouchEventDown(x, y);
-//    }
-//}
-//
-///*!
-//	This function handle Touch event move action.
-// 
-//	\param[in] x and y screen pixel position.
-// 
-//	\return None.
-// */
-//void Scene::TouchEventMove( float x, float y )
-//{
-//    for( int i=0; i<models.size(); i++ ){
-//        models.at(i)->TouchEventMove(x, y);
-//    }
-//}
-//
-///*!
-//	This function handle Touch event release action.
-// 
-//	\param[in] x and y screen pixel position.
-// 
-//	\return None.
-// */
-//void Scene::TouchEventRelease( float x, float y )
-//{
-//    for( int i=0; i<models.size(); i++ ){
-//        models.at(i)->TouchEventRelease(x, y);
-//    }
-//}
+/*!
+	This function handle Touch event down action.
+ 
+	\param[in] x and y screen pixel position.
+ 
+	\return None.
+ */
+void Scene::TouchEventDown( float x, float y )
+{
+    for( int i=0; i<models.size(); i++ ){
+        models.at(i)->TouchEventDown(x, y);
+    }
+}
+
+/*!
+	This function handle Touch event move action.
+ 
+	\param[in] x and y screen pixel position.
+ 
+	\return None.
+ */
+void Scene::TouchEventMove( float x, float y )
+{
+    for( int i=0; i<models.size(); i++ ){
+        models.at(i)->TouchEventMove(x, y);
+    }
+}
+
+/*!
+	This function handle Touch event release action.
+ 
+	\param[in] x and y screen pixel position.
+ 
+	\return None.
+ */
+void Scene::TouchEventRelease( float x, float y )
+{
+    for( int i=0; i<models.size(); i++ ){
+        models.at(i)->TouchEventRelease(x, y);
+    }
+}
 
 
 /*!
@@ -293,7 +292,7 @@ void Scene::setUpProjection()
     
     TransformObj.TransformSetMatrixMode( VIEW_MATRIX );
     TransformObj.TransformLoadIdentity();
-    glm::vec3 viewpoint(0.0,25.0,30.0); glm::vec3 center(0.0,5.0,0.0); glm::vec3 up(0.0, 1.0, 0.0);
+    glm::vec3 viewpoint(0.0,5.0,20.0); glm::vec3 center(0.0,5.0,0.0); glm::vec3 up(0.0, 1.0, 0.0);
     TransformObj.TransformLookAt(&viewpoint, &center, &up);
     
     TransformObj.TransformSetMatrixMode( MODEL_MATRIX );
