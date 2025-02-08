@@ -132,7 +132,11 @@ namespace glm
 		float inv_det = typename genType::value_type(1) / det;
 
 		genType tvec = orig - vert0;
-
+        // Baycentric Coordinates
+        // p = (1 - u - v)V0 + uV1 + uV2
+        // p 삼각형의 교차점
+        // 여기서 u = position.y
+        // v = position.z
 		position.y = dot(tvec, pvec) * inv_det;
 		if (position.y < typename genType::value_type(0) || position.y > typename genType::value_type(1)) {
             //LOGI("dlgmlals3  1 false : %f ", position.y);
