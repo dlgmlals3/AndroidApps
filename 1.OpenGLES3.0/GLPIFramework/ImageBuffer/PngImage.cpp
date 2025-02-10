@@ -9,7 +9,8 @@ PngImage::PngImage(void)
 
 PngImage::~PngImage(void)
 {
-	//LOGI("destructor: PNG");
+	//
+    // LOGI("destructor: PNG");
 	if ( memData.bitsraw )
 		delete memData.bitsraw;
 	memData.bitsraw = NULL;
