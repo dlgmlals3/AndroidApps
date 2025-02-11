@@ -52,7 +52,6 @@ class GLESView extends GLSurfaceView {
         /* Set the renderer responsible for frame rendering */
         Renderer rendererObj = new Renderer();
         rendererObj.filePath = filePathArg;
-
         setRenderer(rendererObj);
     }
 
